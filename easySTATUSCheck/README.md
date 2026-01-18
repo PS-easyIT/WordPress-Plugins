@@ -1,7 +1,7 @@
 # easySTATUSCheck
 
 ![easySTATUSCheck Logo](https://img.shields.io/badge/WordPress-Plugin-blue?style=for-the-badge&logo=wordpress)
-![Version](https://img.shields.io/badge/Version-1.0.0-green?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.1.3-green?style=for-the-badge)
 ![PHP](https://img.shields.io/badge/PHP-7.4+-purple?style=for-the-badge&logo=php)
 ![WordPress](https://img.shields.io/badge/WordPress-5.0+-blue?style=for-the-badge&logo=wordpress)
 
@@ -9,6 +9,7 @@ Ein professionelles WordPress-Plugin zur Überwachung von Cloud-Services, Hostin
 
 **Autor:** Andreas Hepp  
 **Webseite:** [phinit.de](https://phinit.de)  
+**Version:** 1.1.3  
 **Letzte Aktualisierung:** 18.01.2026
 
 ## 🚀 Features
@@ -90,24 +91,19 @@ Verwenden Sie den `[easy_status_display]` Shortcode, um die Status-Anzeige auf I
 - **Schnellaktionen** - Aktivieren/Deaktivieren, Prüfen, Bearbeiten, Löschen
 - **Service hinzufügen** - Manuell oder aus Templates
 
-#### 3. History
-- **Graph Cards** - Alle aktiven Services als Mini-Charts (3 Spalten)
-- **Uptime-Statistiken** - Prozentsatz, Durchschnittszeit, Anzahl Checks
-- **Zeitraum-Auswahl** - 24h, 7d, 30d, 90d
-- **Chart.js Integration** - Visualisierung der Status-Historie
-
-#### 4. Templates
-- **8 Kategorien** - Cloud, Hosting (DE), DevOps, Security, E-Mail, Datenbanken, DNS, Monitoring
-- **40+ Services** - AWS, Azure, GCP, GitHub, GitLab, Docker, MongoDB, etc.
+#### 3. Templates
+- **8 Kategorien** - Microsoft 365, Monitoring/Analytics/CDN, Cloud-Anbieter, Hosting, DevOps, Security/SSL/DNS, E-Mail, Datenbanken
+- **80+ IT-Services** - AWS, Azure, GCP, GitHub, GitLab, Docker, MongoDB, Hetzner, OVH, etc.
+- **30+ Hosting-Anbieter** - Deutschland, Frankreich, Niederlande, Österreich, Schweiz, USA
 - **Einzelne Templates** - Kein Bulk-Add, nur einzeln hinzufügen
 
-#### 5. Incidents
+#### 4. Incidents
 - **CVE RSS Feeds** - Integration von Sicherheitswarnungen
 - **Feed-Verwaltung** - Name und URL für RSS-Feeds
 - **Max Items** - Anzahl der angezeigten CVE-Items (5-50)
 - **Public Incidents Page** - Öffentliche Anzeige der Incidents
 
-#### 6. Einstellungen (4 Tabs)
+#### 5. Einstellungen (4 Tabs)
 - **Allgemein** - Public Pages aktivieren, Basis-URL, Prüfintervall, Timeout
 - **Benachrichtigungen** - E-Mail-Alerts aktivieren, Empfänger-Adresse
 - **Design** - 6 Farbeinstellungen, Anzeigeoptionen, Auto-Refresh
@@ -123,29 +119,31 @@ Das Plugin enthält 40+ vordefinierte IT-Services in 8 professionellen Kategorie
 ### 2. Cloud-Anbieter (AWS, Azure, GCP)
 - AWS Status, Azure Status, Google Cloud Status, DigitalOcean, Linode, Vultr
 
-### 3. Hosting-Anbieter
-- IONOS, Hetzner, Mittwald, Netcup, All-Inkl, Strato
+### 3. Hosting-Anbieter (30 Services)
+- **Deutschland:** IONOS, Hetzner, Mittwald, Netcup, All-Inkl, Strato, Host Europe, dogado, Alfahosting
+- **Frankreich:** OVH, Scaleway, Online.net
+- **Niederlande:** TransIP, Byte, Vimexx
+- **Österreich:** World4You, easyname
+- **Schweiz:** Hostpoint, Infomaniak, cyon
+- **USA:** GoDaddy, Bluehost, HostGator, SiteGround, DreamHost, A2 Hosting, InMotion, Hostinger
 
-### 4. CDN & Performance
-- Cloudflare CDN, Fastly CDN, KeyCDN, BunnyCDN
+### 4. Monitoring, Analytics & CDN (14 Services)
+- **CDN:** Cloudflare, Fastly, KeyCDN, BunnyCDN, Amazon CloudFront, Akamai, StackPath
+- **Monitoring:** Google Analytics, New Relic, Datadog, Pingdom, Sentry, Grafana, Splunk
 
-### 5. DevOps & CI/CD
-- GitHub Status, GitLab Status, Bitbucket Status, Docker Hub, Jenkins
+### 5. DevOps & CI/CD (8 Services)
+- GitHub, GitLab, Bitbucket, Docker Hub, Jenkins, CircleCI, Travis CI, Kubernetes
 
-### 6. Security & SSL
-- Let's Encrypt Status, Cloudflare SSL, Sucuri Security
+### 6. Security, SSL & DNS (6 Services)
+- **Security:** Let's Encrypt, Cloudflare SSL, Sucuri
+- **DNS:** Cloudflare DNS (1.1.1.1), Google DNS (8.8.8.8), Quad9
 
-### 7. E-Mail Services
-- Gmail Status, Mailgun Status, SendGrid Status, Postmark Status
+### 7. E-Mail Services (7 Services)
+- Gmail, Mailgun, SendGrid, Postmark, Amazon SES, Mailchimp, SparkPost
 
-### 8. Datenbanken & Storage
-- MongoDB Atlas, Redis Cloud, Amazon S3, Backblaze B2
+### 8. Datenbanken & Storage (8 Services)
+- MongoDB Atlas, Redis Cloud, Amazon S3, Backblaze B2, PostgreSQL, MySQL, Elasticsearch, Dropbox
 
-### 9. DNS Services
-- Cloudflare DNS (1.1.1.1), Google DNS (8.8.8.8), Quad9 DNS
-
-### 10. Monitoring & Analytics
-- Google Analytics, New Relic, Datadog, Pingdom
 
 ## ⚙️ Konfiguration
 
@@ -337,7 +335,7 @@ wp plugin activate easySTATUSCheck
 - PSR-4 Autoloading
 - Semantic Versioning
 
-## �️ Support-Tools
+## 🛠️ Support-Tools
 
 ### Datenbank-Tools
 - **Prüfen** - Überprüft ob alle Tabellen existieren
@@ -352,21 +350,30 @@ wp plugin activate easySTATUSCheck
 
 ### System-Status
 - WordPress Version, PHP Version, MySQL Version, cURL Status
-- Plugin Version: 1.0.0
+- Plugin Version: 1.1.3
 
-## � Changelog
+## 🔄 Changelog
+
+### Version 1.1.3 (18.01.2026)
+- 🌍 **80+ IT-Service Templates** - Massive Erweiterung auf 8 optimierte Kategorien
+- 📊 **Template-Kategorien optimiert** - Zusammenführung auf 8 übersichtliche Kategorien
+- 🌐 **30+ Hosting-Anbieter** - DE, FR, NL, AT, CH, US mit professionellen Status-APIs
+- 📈 **History aus Admin entfernt** - Nur noch öffentliche History-Seite verfügbar
+- 🔗 **History-Button bei Services** - Direkter Link zur öffentlichen History-Seite
+- 🛠️ **Support-Tab erweitert** - Hilfetext, System-Status, Datenbank-Tools, Cron-Management
+- 📊 **Template-Zähler korrigiert** - Korrekte Anzeige der Template-Anzahl
+- 🔧 **Bug-Fixes** - Parse Errors behoben, Code-Optimierungen
 
 ### Version 1.0.0 (18.01.2026)
 - ✨ **Initiale Veröffentlichung**
-- 🎯 **Admin-Menü komplett überarbeitet** - Dashboard, Services, History, Templates, Incidents, Einstellungen
-- � **3-Spalten Grid-Layout** - Moderne Card-Darstellung für Services und History
-- � **Public Status Pages** - 3 öffentliche Seiten (Services, Incidents, History)
-- � **History mit Charts** - Chart.js Integration für visuelle Statistiken
+- 🎯 **Admin-Menü komplett überarbeitet** - Dashboard, Services, Templates, Incidents, Einstellungen
+- 📊 **3-Spalten Grid-Layout** - Moderne Card-Darstellung für Services
+- 🌐 **Public Status Pages** - 3 öffentliche Seiten (Services, Incidents, History)
 - 🔔 **CVE/Incident Tracking** - RSS-Feed Integration für Sicherheitswarnungen
 - 🎨 **4-Tab Einstellungen** - Allgemein, Benachrichtigungen, Design, Support
 - 🛠️ **Support-Tools** - Datenbank-Tools und Cron-Management
 - 🔌 **40+ IT-Service Templates** - 8 Kategorien mit professionellen Services
-- � **E-Mail-Benachrichtigungen** - Automatische Alerts bei Statusänderungen
+- 📧 **E-Mail-Benachrichtigungen** - Automatische Alerts bei Statusänderungen
 - 🔒 **Security** - Nonce-Schutz, Prepared Statements, XSS-Prevention
 - 🚀 **Performance** - Caching, Asynchrone Checks, Auto-Cleanup
 
@@ -377,5 +384,5 @@ wp plugin activate easySTATUSCheck
 *easySTATUSCheck - Professionelles Service-Monitoring für WordPress*
 
 **Webseite:** [phinit.de](https://phinit.de)  
-**Version:** 1.0.0  
+**Version:** 1.1.3  
 **Datum:** 18.01.2026
