@@ -153,7 +153,7 @@ get_header();
     
     .esc-history-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 20px;
         margin-bottom: 40px;
         animation: fadeIn 0.6s ease-out 0.2s both;
@@ -281,6 +281,12 @@ get_header();
         font-size: 16px;
     }
     
+    @media (max-width: 1200px) {
+        .esc-history-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
     @media (max-width: 768px) {
         .esc-public-history {
             padding: 40px 16px;
@@ -380,6 +386,14 @@ get_header();
             </tbody>
         </table>
     </div>
+</div>
+
+<!-- Copyright Box -->
+<div style="background: linear-gradient(135deg, #f9fafb 0%, #fff 100%); border-top: 1px solid #e5e7eb; padding: 20px; text-align: center; margin-top: 60px;">
+    <p style="margin: 0; color: #6b7280; font-size: 14px;">
+        Powered by <strong style="color: #2271b1;">mySTATUShub</strong> © <?php echo date('Y'); ?> 
+        <a href="https://phinit.de" target="_blank" rel="noopener noreferrer" style="color: #2271b1; text-decoration: none; font-weight: 600;">PHiNiT.de</a>
+    </p>
 </div>
 
 <?php

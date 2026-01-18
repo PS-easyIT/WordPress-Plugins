@@ -16,8 +16,14 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'gen
 if ( isset( $_POST['esc_save_settings'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'esc_settings_' . $active_tab ) ) {
     switch ( $active_tab ) {
         case 'general':
-            update_option( 'esc_public_status_enabled', isset( $_POST['esc_public_status_enabled'] ) ? 1 : 0 );
-            update_option( 'esc_public_status_slug', sanitize_title( $_POST['esc_public_status_slug'] ) );
+            update_option( 'esc_public_status_enabled', isset( $_POST['esc_public_status_enabled'] ) );
+            update_option( 'esc_public_services_enabled', isset( $_POST['esc_public_services_enabled'] ) );
+            update_option( 'esc_public_incidents_enabled', isset( $_POST['esc_public_incidents_enabled'] ) );
+            update_option( 'esc_public_history_enabled', isset( $_POST['esc_public_history_enabled'] ) );
+            update_option( 'esc_public_status_slug', sanitize_title( $_POST['esc_public_status_slug'] ?? 'status' ) );
+            update_option( 'esc_public_services_slug', sanitize_title( $_POST['esc_public_services_slug'] ?? 'services' ) );
+            update_option( 'esc_public_incidents_slug', sanitize_title( $_POST['esc_public_incidents_slug'] ?? 'incidents' ) );
+            update_option( 'esc_public_history_slug', sanitize_title( $_POST['esc_public_history_slug'] ?? 'history' ) );
             update_option( 'esc_general_settings', array(
                 'default_interval' => intval( $_POST['default_interval'] ?? 300 ),
                 'default_timeout' => intval( $_POST['default_timeout'] ?? 10 )
@@ -45,13 +51,20 @@ if ( isset( $_POST['esc_save_settings'] ) && wp_verify_nonce( $_POST['_wpnonce']
                 'refresh_interval' => intval( $_POST['refresh_interval'] ?? 300 ),
                 'columns' => intval( $_POST['columns'] ?? 3 ),
                 'page_title' => sanitize_text_field( $_POST['page_title'] ?? 'Service Status' ),
-                'page_description' => sanitize_text_field( $_POST['page_description'] ?? 'Aktuelle Status-Informationen unserer Services' )
+                'page_description' => sanitize_text_field( $_POST['page_description'] ?? 'Aktuelle Status-Informationen unserer Services' ),
+                'incidents_title' => sanitize_text_field( $_POST['incidents_title'] ?? 'Security Incidents & CVE Feeds' ),
+                'incidents_description' => sanitize_text_field( $_POST['incidents_description'] ?? 'Aktuelle Sicherheitsvorfälle und Schwachstellen aus verschiedenen Quellen' )
             );
             update_option( 'esc_public_settings', $public_settings );
             break;
     }
     
     echo '<div class="notice notice-success"><p>' . __( 'Einstellungen gespeichert.', 'easy-status-check' ) . '</p></div>';
+}
+
+// Pro Feature Label Helper
+function esc_pro_label() {
+    return '<span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px;">⭐ PRO</span>';
 }
 
 // Get settings
@@ -69,10 +82,18 @@ $public_settings = get_option( 'esc_public_settings', array(
     'refresh_interval' => 300,
     'columns' => 3,
     'page_title' => 'Service Status',
-    'page_description' => 'Aktuelle Status-Informationen unserer Services'
+    'page_description' => 'Aktuelle Status-Informationen unserer Services',
+    'incidents_title' => 'Security Incidents & CVE Feeds',
+    'incidents_description' => 'Aktuelle Sicherheitsvorfälle und Schwachstellen aus verschiedenen Quellen'
 ) );
 $public_status_enabled = get_option( 'esc_public_status_enabled', false );
+$public_services_enabled = get_option( 'esc_public_services_enabled', true );
+$public_incidents_enabled = get_option( 'esc_public_incidents_enabled', true );
+$public_history_enabled = get_option( 'esc_public_history_enabled', true );
 $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
+$public_services_slug = get_option( 'esc_public_services_slug', 'services' );
+$public_incidents_slug = get_option( 'esc_public_incidents_slug', 'incidents' );
+$public_history_slug = get_option( 'esc_public_history_slug', 'history' );
 ?>
 
 <div class="wrap">
@@ -91,6 +112,9 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
         <a href="?page=easy-status-check-settings&tab=support" class="nav-tab <?php echo $active_tab === 'support' ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'Support', 'easy-status-check' ); ?>
         </a>
+        <a href="?page=easy-status-check-settings&tab=pro" class="nav-tab <?php echo $active_tab === 'pro' ? 'nav-tab-active' : ''; ?>" style="color: #d63638; font-weight: 600;">
+            ⭐ <?php esc_html_e( 'Get Pro', 'easy-status-check' ); ?>
+        </a>
     </h2>
     
     <form method="post" action="">
@@ -101,24 +125,77 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
             <!-- ALLGEMEIN TAB -->
             <h2><?php esc_html_e( 'Allgemeine Einstellungen', 'easy-status-check' ); ?></h2>
             
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '🌐 Public Pages', 'easy-status-check' ); ?></h3>
             <table class="form-table">
                 <tr>
-                    <th scope="row"><?php esc_html_e( 'Public Pages aktivieren', 'easy-status-check' ); ?></th>
+                    <th scope="row"><?php esc_html_e( 'Master-Schalter', 'easy-status-check' ); ?></th>
                     <td>
                         <label>
                             <input type="checkbox" name="esc_public_status_enabled" value="1" <?php checked( $public_status_enabled ); ?>>
-                            <?php esc_html_e( 'Öffentliche Seiten aktivieren (Services, Incidents, History)', 'easy-status-check' ); ?>
+                            <?php esc_html_e( 'Public Pages generell aktivieren', 'easy-status-check' ); ?>
                         </label>
-                        <p class="description"><?php esc_html_e( 'Aktiviert alle öffentlichen Status-Seiten', 'easy-status-check' ); ?></p>
+                        <p class="description"><?php esc_html_e( 'Hauptschalter für alle öffentlichen Seiten (ohne Login-Pflicht)', 'easy-status-check' ); ?></p>
                     </td>
                 </tr>
                 
                 <tr>
+                    <th scope="row"><?php esc_html_e( 'Einzelne Seiten aktivieren', 'easy-status-check' ); ?></th>
+                    <td>
+                        <label style="display: block; margin-bottom: 8px;">
+                            <input type="checkbox" name="esc_public_services_enabled" value="1" <?php checked( $public_services_enabled ); ?> <?php disabled( ! $public_status_enabled ); ?>>
+                            <strong><?php esc_html_e( 'Services-Seite', 'easy-status-check' ); ?></strong> - <?php esc_html_e( 'Übersicht aller Services', 'easy-status-check' ); ?>
+                        </label>
+                        <label style="display: block; margin-bottom: 8px;">
+                            <input type="checkbox" name="esc_public_incidents_enabled" value="1" <?php checked( $public_incidents_enabled ); ?> <?php disabled( ! $public_status_enabled ); ?>>
+                            <strong><?php esc_html_e( 'Incidents-Seite', 'easy-status-check' ); ?></strong> - <?php esc_html_e( 'CVE-Feeds und Sicherheitsvorfälle', 'easy-status-check' ); ?>
+                        </label>
+                        <label style="display: block;">
+                            <input type="checkbox" name="esc_public_history_enabled" value="1" <?php checked( $public_history_enabled ); ?> <?php disabled( ! $public_status_enabled ); ?>>
+                            <strong><?php esc_html_e( 'History-Seite', 'easy-status-check' ); ?></strong> - <?php esc_html_e( 'Service-Historie mit Statistiken', 'easy-status-check' ); ?>
+                        </label>
+                        <p class="description"><?php esc_html_e( 'Wählen Sie, welche Seiten öffentlich zugänglich sein sollen', 'easy-status-check' ); ?></p>
+                    </td>
+                </tr>
+            </table>
+            
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '🔗 URL-Struktur', 'easy-status-check' ); ?></h3>
+            <table class="form-table">
+                <tr>
                     <th scope="row"><?php esc_html_e( 'Basis URL-Slug', 'easy-status-check' ); ?></th>
                     <td>
-                        <input type="text" name="esc_public_status_slug" value="<?php echo esc_attr( $public_status_slug ); ?>" class="regular-text">
+                        <input type="text" name="esc_public_status_slug" value="<?php echo esc_attr( $public_status_slug ); ?>" class="regular-text" placeholder="status">
                         <p class="description">
-                            <?php printf( __( 'Basis-URL: %s (Unterseiten: /services, /incidents, /history/ID)', 'easy-status-check' ), '<code>' . home_url( '/' ) . esc_html( $public_status_slug ) . '</code>' ); ?>
+                            <?php printf( __( 'Basis-URL: %s', 'easy-status-check' ), '<code>' . home_url( '/' ) . esc_html( $public_status_slug ) . '</code>' ); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Services URL-Slug', 'easy-status-check' ); ?></th>
+                    <td>
+                        <input type="text" name="esc_public_services_slug" value="<?php echo esc_attr( $public_services_slug ); ?>" class="regular-text" placeholder="services">
+                        <p class="description">
+                            <?php printf( __( 'Vollständige URL: %s', 'easy-status-check' ), '<code>' . home_url( '/' . $public_status_slug . '/' . $public_services_slug ) . '</code>' ); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Incidents URL-Slug', 'easy-status-check' ); ?></th>
+                    <td>
+                        <input type="text" name="esc_public_incidents_slug" value="<?php echo esc_attr( $public_incidents_slug ); ?>" class="regular-text" placeholder="incidents">
+                        <p class="description">
+                            <?php printf( __( 'Vollständige URL: %s', 'easy-status-check' ), '<code>' . home_url( '/' . $public_status_slug . '/' . $public_incidents_slug ) . '</code>' ); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'History URL-Slug', 'easy-status-check' ); ?></th>
+                    <td>
+                        <input type="text" name="esc_public_history_slug" value="<?php echo esc_attr( $public_history_slug ); ?>" class="regular-text" placeholder="history">
+                        <p class="description">
+                            <?php printf( __( 'Vollständige URL: %s', 'easy-status-check' ), '<code>' . home_url( '/' . $public_status_slug . '/' . $public_history_slug . '/[ID]' ) . '</code>' ); ?>
                         </p>
                     </td>
                 </tr>
@@ -142,7 +219,10 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
                         <?php endif; ?>
                     </td>
                 </tr>
-                
+            </table>
+            
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '⚙️ Service-Monitoring', 'easy-status-check' ); ?></h3>
+            <table class="form-table">
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Standard Prüfintervall', 'easy-status-check' ); ?></th>
                     <td>
@@ -195,23 +275,43 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
             <h2><?php esc_html_e( 'Design-Einstellungen für Public Pages', 'easy-status-check' ); ?></h2>
             <p class="description"><?php esc_html_e( 'Passen Sie das Aussehen der öffentlichen Status-Seiten an.', 'easy-status-check' ); ?></p>
             
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '📄 Seitentexte', 'easy-status-check' ); ?></h3>
             <table class="form-table">
                 <tr>
-                    <th scope="row"><?php esc_html_e( 'Seitentitel', 'easy-status-check' ); ?></th>
+                    <th scope="row"><?php esc_html_e( 'Services - Titel', 'easy-status-check' ); ?></th>
                     <td>
-                        <input type="text" name="page_title" value="<?php echo esc_attr( $public_settings['page_title'] ); ?>" class="regular-text">
-                        <p class="description"><?php esc_html_e( 'Titel der öffentlichen Status-Seiten', 'easy-status-check' ); ?></p>
+                        <input type="text" name="page_title" value="<?php echo esc_attr( isset( $public_settings['page_title'] ) ? $public_settings['page_title'] : 'Service Status' ); ?>" class="regular-text">
+                        <p class="description"><?php esc_html_e( 'Titel der öffentlichen Services-Seite', 'easy-status-check' ); ?></p>
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><?php esc_html_e( 'Seitenbeschreibung', 'easy-status-check' ); ?></th>
+                    <th scope="row"><?php esc_html_e( 'Services - Beschreibung', 'easy-status-check' ); ?></th>
                     <td>
-                        <input type="text" name="page_description" value="<?php echo esc_attr( $public_settings['page_description'] ); ?>" class="large-text">
-                        <p class="description"><?php esc_html_e( 'Beschreibung unter dem Titel', 'easy-status-check' ); ?></p>
+                        <input type="text" name="page_description" value="<?php echo esc_attr( isset( $public_settings['page_description'] ) ? $public_settings['page_description'] : 'Aktuelle Status-Informationen unserer Services' ); ?>" class="large-text">
+                        <p class="description"><?php esc_html_e( 'Beschreibung unter dem Titel der Services-Seite', 'easy-status-check' ); ?></p>
                     </td>
                 </tr>
                 
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Incidents - Titel', 'easy-status-check' ); ?></th>
+                    <td>
+                        <input type="text" name="incidents_title" value="<?php echo esc_attr( isset( $public_settings['incidents_title'] ) ? $public_settings['incidents_title'] : 'Security Incidents & CVE Feeds' ); ?>" class="regular-text">
+                        <p class="description"><?php esc_html_e( 'Titel der öffentlichen Incidents-Seite', 'easy-status-check' ); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Incidents - Beschreibung', 'easy-status-check' ); ?></th>
+                    <td>
+                        <input type="text" name="incidents_description" value="<?php echo esc_attr( isset( $public_settings['incidents_description'] ) ? $public_settings['incidents_description'] : 'Aktuelle Sicherheitsvorfälle und Schwachstellen aus verschiedenen Quellen' ); ?>" class="large-text">
+                        <p class="description"><?php esc_html_e( 'Beschreibung unter dem Titel der Incidents-Seite', 'easy-status-check' ); ?></p>
+                    </td>
+                </tr>
+            </table>
+            
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '🎨 Farbschema', 'easy-status-check' ); ?></h3>
+            <table class="form-table">
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Primärfarbe', 'easy-status-check' ); ?></th>
                     <td>
@@ -260,20 +360,10 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
                     </td>
                 </tr>
                 
-                <tr>
-                    <th scope="row"><?php esc_html_e( 'Anzeigeoptionen', 'easy-status-check' ); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="show_response_time" value="1" <?php checked( $public_settings['show_response_time'] ); ?>>
-                            <?php esc_html_e( 'Antwortzeiten anzeigen', 'easy-status-check' ); ?>
-                        </label><br>
-                        <label>
-                            <input type="checkbox" name="show_uptime" value="1" <?php checked( $public_settings['show_uptime'] ); ?>>
-                            <?php esc_html_e( 'Uptime-Statistiken anzeigen', 'easy-status-check' ); ?>
-                        </label>
-                    </td>
-                </tr>
-                
+            </table>
+            
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '⚙️ Layout-Optionen', 'easy-status-check' ); ?></h3>
+            <table class="form-table">
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Spaltenanzahl (Services)', 'easy-status-check' ); ?></th>
                     <td>
@@ -299,7 +389,105 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
                         <p class="description"><?php esc_html_e( 'Wie oft soll die öffentliche Seite automatisch aktualisiert werden?', 'easy-status-check' ); ?></p>
                     </td>
                 </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e( 'Copyright ausblenden', 'easy-status-check' ); ?>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="hide_copyright" value="1" disabled>
+                            <?php esc_html_e( 'Copyright-Box auf Public Pages ausblenden', 'easy-status-check' ); ?>
+                        </label>
+                        <p class="description" style="color: #666;">
+                            <?php esc_html_e( 'Diese Funktion ist nur in der Pro-Version verfügbar.', 'easy-status-check' ); ?>
+                            <a href="?page=easy-status-check-settings&tab=pro" style="color: #667eea; font-weight: 600;"><?php esc_html_e( 'Jetzt upgraden', 'easy-status-check' ); ?></a>
+                            <?php echo esc_pro_label(); ?>
+                        </p>
+                    </td>
+                </tr>
             </table>
+            
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '📊 Erweiterte Optionen', 'easy-status-check' ); ?></h3>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e( 'Detaillierte Analytics', 'easy-status-check' ); ?>
+                    </th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="enable_analytics" value="1" disabled>
+                            <?php esc_html_e( 'Erweiterte Statistiken und Reports aktivieren', 'easy-status-check' ); ?>
+                        </label>
+                        <p class="description" style="color: #666;">
+                            <?php esc_html_e( 'Detaillierte Auswertungen, Uptime-Reports, Performance-Analysen. Nur in Pro-Version.', 'easy-status-check' ); ?>
+                            <a href="?page=easy-status-check-settings&tab=pro" style="color: #667eea; font-weight: 600;"><?php esc_html_e( 'Jetzt upgraden', 'easy-status-check' ); ?></a>
+                            <?php echo esc_pro_label(); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e( 'Erweiterte Benachrichtigungen', 'easy-status-check' ); ?>
+                    </th>
+                    <td>
+                        <label style="display: block; margin-bottom: 8px;">
+                            <input type="checkbox" name="enable_sms" value="1" disabled>
+                            <?php esc_html_e( 'SMS-Benachrichtigungen', 'easy-status-check' ); ?>
+                        </label>
+                        <label style="display: block; margin-bottom: 8px;">
+                            <input type="checkbox" name="enable_slack" value="1" disabled>
+                            <?php esc_html_e( 'Slack-Integration', 'easy-status-check' ); ?>
+                        </label>
+                        <label style="display: block;">
+                            <input type="checkbox" name="enable_teams" value="1" disabled>
+                            <?php esc_html_e( 'Microsoft Teams-Integration', 'easy-status-check' ); ?>
+                        </label>
+                        <p class="description" style="color: #666;">
+                            <?php esc_html_e( 'Erweiterte Benachrichtigungskanäle für schnellere Reaktionszeiten. Nur in Pro-Version.', 'easy-status-check' ); ?>
+                            <a href="?page=easy-status-check-settings&tab=pro" style="color: #667eea; font-weight: 600;"><?php esc_html_e( 'Jetzt upgraden', 'easy-status-check' ); ?></a>
+                            <?php echo esc_pro_label(); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            
+        <?php elseif ( $active_tab === 'pro' ) : ?>
+            <!-- GET PRO TAB -->
+            <div style="max-width: 800px; margin: 40px auto; text-align: center;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); color: white;">
+                    <h2 style="font-size: 42px; margin-bottom: 20px; color: white;">⭐ mySTATUShub Pro</h2>
+                    <p style="font-size: 20px; margin-bottom: 30px; opacity: 0.95;">Erweitern Sie Ihr Monitoring mit professionellen Features</p>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px; margin: 30px 0; backdrop-filter: blur(10px);">
+                        <h3 style="color: white; margin-bottom: 20px; font-size: 24px;">🚀 Pro Features</h3>
+                        <ul style="list-style: none; padding: 0; text-align: left; max-width: 600px; margin: 0 auto;">
+                            <li style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 16px;">✅ Erweiterte Monitoring-Optionen</li>
+                            <li style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 16px;">✅ 1 Jahr Support & Updates</li>
+                            <li style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 16px;">✅ Erweiterte Templates (bis zu 350+ Services)</li>
+                            <li style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 16px;">✅ Import/Export (Services & History)</li>
+                            <li style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.2); font-size: 16px;">✅ Detaillierte Analytics & Reports</li>
+                            <li style="padding: 12px 0; font-size: 16px;">✅ White-Label Optionen (Copyright ausblenden)</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 12px; margin: 20px 0;">
+                        <p style="font-size: 16px; margin: 0 0 10px 0; opacity: 0.9;">Einmalige Zahlung</p>
+                        <p style="font-size: 48px; font-weight: 700; margin: 0; color: white;">19,99 €</p>
+                        <p style="font-size: 14px; margin: 10px 0 0 0; opacity: 0.8;">Lebenslanger Zugriff • Alle Updates inklusive</p>
+                    </div>
+                    
+                    <a href="https://phinit.de/wordpress-plugins" target="_blank" rel="noopener noreferrer" 
+                       style="display: inline-block; background: white; color: #667eea; padding: 18px 48px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 18px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                        🛒 Jetzt für 19,99 € kaufen
+                    </a>
+                    
+                    <p style="margin-top: 30px; font-size: 14px; opacity: 0.8;">
+                        Besuchen Sie <strong>phinit.de/wordpress-plugins</strong> für weitere Informationen
+                    </p>
+                </div>
+            </div>
             
         <?php elseif ( $active_tab === 'support' ) : ?>
             <!-- SUPPORT TAB -->
@@ -376,6 +564,58 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
                     }
                 }
             </style>
+            
+            <!-- Pro Features im Support Tab -->
+            <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #2271b1;"><?php esc_html_e( '💼 Erweiterte Tools', 'easy-status-check' ); ?></h3>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e( 'Import/Export', 'easy-status-check' ); ?>
+                    </th>
+                    <td>
+                        <button type="button" class="button" disabled>
+                            <span class="dashicons dashicons-download" style="margin-top: 3px;"></span>
+                            <?php esc_html_e( 'Services exportieren', 'easy-status-check' ); ?>
+                        </button>
+                        <button type="button" class="button" disabled style="margin-left: 10px;">
+                            <span class="dashicons dashicons-upload" style="margin-top: 3px;"></span>
+                            <?php esc_html_e( 'Services importieren', 'easy-status-check' ); ?>
+                        </button>
+                        <button type="button" class="button" disabled style="margin-left: 10px;">
+                            <span class="dashicons dashicons-backup" style="margin-top: 3px;"></span>
+                            <?php esc_html_e( 'History exportieren', 'easy-status-check' ); ?>
+                        </button>
+                        <p class="description" style="color: #666; margin-top: 10px;">
+                            <?php esc_html_e( 'Exportieren und importieren Sie Services und History-Daten. Einzeln nach Service oder gesamt. Nur in Pro-Version.', 'easy-status-check' ); ?>
+                            <a href="?page=easy-status-check-settings&tab=pro" style="color: #667eea; font-weight: 600;"><?php esc_html_e( 'Jetzt upgraden', 'easy-status-check' ); ?></a>
+                            <?php echo esc_pro_label(); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <?php esc_html_e( 'Erweiterte Templates', 'easy-status-check' ); ?>
+                    </th>
+                    <td>
+                        <p style="margin: 0 0 10px 0; color: #1d2327;">
+                            <strong><?php esc_html_e( 'Zugriff auf 350+ vorkonfigurierte Service-Templates:', 'easy-status-check' ); ?></strong>
+                        </p>
+                        <ul style="margin: 0; padding-left: 20px; color: #666;">
+                            <li><?php esc_html_e( 'Erweiterte Cloud-Provider (AWS, Azure, GCP, Oracle Cloud)', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'Internationale Hosting-Anbieter (50+ Länder)', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'SaaS-Dienste (CRM, Marketing, Analytics)', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'Development-Tools (GitHub, GitLab, Bitbucket, CI/CD)', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'E-Commerce-Plattformen (Shopify, WooCommerce, Magento)', 'easy-status-check' ); ?></li>
+                        </ul>
+                        <p class="description" style="color: #666; margin-top: 10px;">
+                            <?php esc_html_e( 'Professionelle Templates mit optimierten Prüfintervallen. Nur in Pro-Version.', 'easy-status-check' ); ?>
+                            <a href="?page=easy-status-check-settings&tab=pro" style="color: #667eea; font-weight: 600;"><?php esc_html_e( 'Jetzt upgraden', 'easy-status-check' ); ?></a>
+                            <?php echo esc_pro_label(); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
             
             <div class="esc-support-grid">
                 <!-- SYSTEM CARD -->

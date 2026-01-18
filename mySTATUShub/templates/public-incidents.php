@@ -19,7 +19,9 @@ $public_settings = get_option( 'esc_public_settings', array(
     'background_color' => '#f0f0f1',
     'text_color' => '#1d2327',
     'page_title' => 'Service Status',
-    'page_description' => 'Aktuelle Status-Informationen unserer Services'
+    'page_description' => 'Aktuelle Status-Informationen unserer Services',
+    'incidents_title' => 'Security Incidents & CVE Feeds',
+    'incidents_description' => 'Aktuelle Sicherheitsvorfälle und Schwachstellen aus verschiedenen Quellen'
 ) );
 
 /**
@@ -101,10 +103,6 @@ get_header();
         border-radius: var(--esc-border-radius);
         box-shadow: var(--esc-shadow-md);
         border: 1px solid #e5e7eb;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 48px;
         position: relative;
         overflow: hidden;
     }
@@ -325,6 +323,64 @@ get_header();
         line-height: 1.6;
     }
     
+    .esc-feed-overview {
+        background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+        padding: 20px 28px;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-sm);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+        animation: fadeIn 0.6s ease-out 0.3s both;
+    }
+    
+    .esc-feed-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .esc-feed-info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--esc-primary)15, var(--esc-primary)25);
+        color: var(--esc-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    
+    .esc-feed-info-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .esc-feed-info-label {
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .esc-feed-info-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--esc-text);
+        line-height: 1;
+    }
+    
     @media (max-width: 1200px) {
         .esc-cve-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -375,14 +431,28 @@ get_header();
 
 <div class="esc-public-incidents">
     <div class="esc-public-header">
-        <h1><?php echo esc_html( isset( $public_settings['page_title'] ) ? $public_settings['page_title'] : 'Service Status' ); ?></h1>
-        <p><?php echo esc_html( isset( $public_settings['page_description'] ) ? $public_settings['page_description'] : 'Aktuelle Status-Informationen unserer Services' ); ?></p>
+        <h1><?php echo esc_html( isset( $public_settings['incidents_title'] ) ? $public_settings['incidents_title'] : 'Security Incidents & CVE Feeds' ); ?></h1>
+        <p><?php echo esc_html( isset( $public_settings['incidents_description'] ) ? $public_settings['incidents_description'] : 'Aktuelle Sicherheitsvorfälle und Schwachstellen aus verschiedenen Quellen' ); ?></p>
     </div>
 
-    <div class="esc-public-nav">
-        <a href="<?php echo home_url( '/' . $base_slug . '/services' ); ?>"><?php _e( 'Services', 'easy-status-check' ); ?></a>
-        <a href="<?php echo home_url( '/' . $base_slug . '/incidents' ); ?>" class="active"><?php _e( 'Incidents', 'easy-status-check' ); ?></a>
-    </div>
+    <?php if ( ! empty( $cve_feeds ) ) : ?>
+        <div class="esc-feed-overview">
+            <div class="esc-feed-info" style="flex: 1;">
+                <div class="esc-feed-info-icon">
+                    <span>🔖</span>
+                </div>
+                <div class="esc-feed-info-text">
+                    <div class="esc-feed-info-label"><?php _e( 'Aktive Quellen', 'easy-status-check' ); ?></div>
+                    <div class="esc-feed-info-value" style="font-size: 14px; font-weight: 600;">
+                        <?php 
+                        $feed_names = array_map( function($feed) { return $feed['name']; }, $cve_feeds );
+                        echo esc_html( implode( ', ', $feed_names ) );
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <?php if ( empty( $cve_feeds ) ) : ?>
         <div class="esc-no-feeds">
@@ -411,6 +481,14 @@ get_header();
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
+</div>
+
+<!-- Copyright Box -->
+<div style="background: linear-gradient(135deg, #f9fafb 0%, #fff 100%); border-top: 1px solid #e5e7eb; padding: 20px; text-align: center; margin-top: 60px;">
+    <p style="margin: 0; color: #6b7280; font-size: 14px;">
+        Powered by <strong style="color: #2271b1;">mySTATUShub</strong> © <?php echo date('Y'); ?> 
+        <a href="https://phinit.de" target="_blank" rel="noopener noreferrer" style="color: #2271b1; text-decoration: none; font-weight: 600;">PHiNiT.de</a>
+    </p>
 </div>
 
 <?php

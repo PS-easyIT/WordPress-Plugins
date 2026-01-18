@@ -33,20 +33,33 @@ $columns = isset( $public_settings['columns'] ) ? intval( $public_settings['colu
 
 // Get services with latest status
 $services = $wpdb->get_results( "
-    SELECT 
-        s.*,
+    SELECT DISTINCT
+        s.id,
+        s.name,
+        s.url,
+        s.category,
+        s.enabled,
         l.status as current_status,
         l.response_time,
         l.http_code,
         l.checked_at as last_checked
     FROM $services_table s
-    LEFT JOIN $logs_table l ON s.id = l.service_id
     LEFT JOIN (
-        SELECT service_id, MAX(checked_at) as max_checked
-        FROM $logs_table
-        GROUP BY service_id
-    ) latest ON s.id = latest.service_id AND l.checked_at = latest.max_checked
+        SELECT 
+            l1.service_id,
+            l1.status,
+            l1.response_time,
+            l1.http_code,
+            l1.checked_at
+        FROM $logs_table l1
+        INNER JOIN (
+            SELECT service_id, MAX(checked_at) as max_checked
+            FROM $logs_table
+            GROUP BY service_id
+        ) l2 ON l1.service_id = l2.service_id AND l1.checked_at = l2.max_checked
+    ) l ON s.id = l.service_id
     WHERE s.enabled = 1
+    GROUP BY s.id
     ORDER BY s.category, s.name
 " );
 
@@ -89,10 +102,6 @@ get_header();
         border-radius: var(--esc-border-radius);
         box-shadow: var(--esc-shadow-md);
         border: 1px solid #e5e7eb;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 48px;
         position: relative;
         overflow: hidden;
     }
@@ -173,6 +182,86 @@ get_header();
         border-color: var(--esc-primary);
         transform: translateY(-2px);
         box-shadow: var(--esc-shadow-md);
+    }
+    
+    .esc-status-overview {
+        background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+        padding: 24px 32px;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-sm);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 32px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        animation: fadeIn 0.6s ease-out 0.3s both;
+    }
+    
+    .esc-status-stat {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .esc-status-stat:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--esc-shadow-md);
+    }
+    
+    .esc-status-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    
+    .esc-status-icon.online {
+        background: linear-gradient(135deg, var(--esc-success)15, var(--esc-success)25);
+        color: var(--esc-success);
+    }
+    
+    .esc-status-icon.offline {
+        background: linear-gradient(135deg, var(--esc-error)15, var(--esc-error)25);
+        color: var(--esc-error);
+    }
+    
+    .esc-status-icon.warning {
+        background: linear-gradient(135deg, var(--esc-warning)15, var(--esc-warning)25);
+        color: var(--esc-warning);
+    }
+    
+    .esc-status-icon.total {
+        background: linear-gradient(135deg, var(--esc-primary)15, var(--esc-primary)25);
+        color: var(--esc-primary);
+    }
+    
+    .esc-status-info {
+        flex: 1;
+    }
+    
+    .esc-status-label {
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+    }
+    
+    .esc-status-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--esc-text);
+        line-height: 1;
     }
     
     .esc-services-grid {
@@ -404,9 +493,69 @@ get_header();
         <p><?php echo esc_html( isset( $public_settings['page_description'] ) ? $public_settings['page_description'] : 'Aktuelle Status-Informationen unserer Services' ); ?></p>
     </div>
 
-    <div class="esc-public-nav">
-        <a href="<?php echo home_url( '/' . $base_slug . '/services' ); ?>" class="active"><?php _e( 'Services', 'easy-status-check' ); ?></a>
-        <a href="<?php echo home_url( '/' . $base_slug . '/incidents' ); ?>"><?php _e( 'Incidents', 'easy-status-check' ); ?></a>
+    <?php
+    // Calculate statistics
+    $total_services = count( $services );
+    $online_count = 0;
+    $offline_count = 0;
+    $warning_count = 0;
+    
+    foreach ( $services as $service ) {
+        $status = $service->current_status ?? 'unknown';
+        if ( $status === 'online' ) {
+            $online_count++;
+        } elseif ( $status === 'offline' ) {
+            $offline_count++;
+        } elseif ( $status === 'warning' ) {
+            $warning_count++;
+        }
+    }
+    ?>
+
+    <div class="esc-status-overview">
+        <div class="esc-status-stat">
+            <div class="esc-status-icon total">
+                <span>📊</span>
+            </div>
+            <div class="esc-status-info">
+                <div class="esc-status-label"><?php _e( 'Gesamt', 'easy-status-check' ); ?></div>
+                <div class="esc-status-value"><?php echo $total_services; ?></div>
+            </div>
+        </div>
+        
+        <div class="esc-status-stat">
+            <div class="esc-status-icon online">
+                <span>✓</span>
+            </div>
+            <div class="esc-status-info">
+                <div class="esc-status-label"><?php _e( 'Online', 'easy-status-check' ); ?></div>
+                <div class="esc-status-value"><?php echo $online_count; ?></div>
+            </div>
+        </div>
+        
+        <?php if ( $warning_count > 0 ) : ?>
+        <div class="esc-status-stat">
+            <div class="esc-status-icon warning">
+                <span>⚠</span>
+            </div>
+            <div class="esc-status-info">
+                <div class="esc-status-label"><?php _e( 'Warnung', 'easy-status-check' ); ?></div>
+                <div class="esc-status-value"><?php echo $warning_count; ?></div>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <?php if ( $offline_count > 0 ) : ?>
+        <div class="esc-status-stat">
+            <div class="esc-status-icon offline">
+                <span>✕</span>
+            </div>
+            <div class="esc-status-info">
+                <div class="esc-status-label"><?php _e( 'Offline', 'easy-status-check' ); ?></div>
+                <div class="esc-status-value"><?php echo $offline_count; ?></div>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 
     <div class="esc-services-grid">
@@ -453,6 +602,14 @@ get_header();
             </div>
         <?php endforeach; ?>
     </div>
+</div>
+
+<!-- Copyright Box -->
+<div style="background: linear-gradient(135deg, #f9fafb 0%, #fff 100%); border-top: 1px solid #e5e7eb; padding: 20px; text-align: center; margin-top: 60px;">
+    <p style="margin: 0; color: #6b7280; font-size: 14px;">
+        Powered by <strong style="color: #2271b1;">mySTATUShub</strong> © <?php echo date('Y'); ?> 
+        <a href="https://phinit.de" target="_blank" rel="noopener noreferrer" style="color: #2271b1; text-decoration: none; font-weight: 600;">PHiNiT.de</a>
+    </p>
 </div>
 
 <?php

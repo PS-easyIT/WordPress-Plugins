@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name:       easySTATUSCheck
+ * Plugin Name: mySTATUShub
  * Plugin URI:        https://phin.network
- * Description:       Umfassende Status-Überwachung für Cloud-Services, Hosting-Anbieter und benutzerdefinierte Services. Ideal für IT-Administratoren und Systemmonitoring.
+ * Description: Professionelles Service-Monitoring für WordPress. Überwachen Sie Cloud-Services, Hosting-Anbieter und eigene Webadressen mit automatischen Benachrichtigungen und öffentlichen Status-Seiten. und Systemmonitoring.
  * Version:           1.0.0
  * Author:            PHIN IT Solutions
  * Author URI:        https://phin.network
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       easy-status-check
+ * Text Domain:       my-status-hub
  * Domain Path:       /languages
  * Requires at least: 5.0
  * Tested up to: 6.5
@@ -22,15 +22,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'EASY_STATUS_CHECK_VERSION', '1.0.0' );
-define( 'EASY_STATUS_CHECK_DIR', plugin_dir_path( __FILE__ ) );
-define( 'EASY_STATUS_CHECK_URL', plugin_dir_url( __FILE__ ) );
-define( 'EASY_STATUS_CHECK_BASENAME', plugin_basename( __FILE__ ) );
+define( 'MY_STATUS_HUB_VERSION', '1.2.1' );
+define( 'MY_STATUS_HUB_DIR', plugin_dir_path( __FILE__ ) );
+define( 'MY_STATUS_HUB_URL', plugin_dir_url( __FILE__ ) );
+define( 'MY_STATUS_HUB_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
  * Main plugin class.
  */
-final class Easy_Status_Check {
+final class My_Status_Hub {
 
     /**
      * The single instance of the class.
@@ -38,10 +38,10 @@ final class Easy_Status_Check {
     private static $_instance = null;
 
     /**
-     * Main Easy_Status_Check Instance.
+     * Main My_Status_Hub Instance.
      * Ensures only one instance of the class is loaded.
      */
-    public static function instance() {
+    public static function get_instance() {
         if ( is_null( self::$_instance ) ) {
             self::$_instance = new self();
         }
@@ -62,7 +62,7 @@ final class Easy_Status_Check {
      */
     private function setup_constants() {
         // Plugin version
-        define( 'ESC_VERSION', EASY_STATUS_CHECK_VERSION );
+        define( 'MY_STATUS_HUB_VERSION', MY_STATUS_HUB_VERSION );
     }
 
     /**
@@ -71,30 +71,30 @@ final class Easy_Status_Check {
     private function includes() {
         // Core features
         // Include shared admin UX
-        if ( file_exists( EASY_STATUS_CHECK_DIR . '../easy-admin-integration.php' ) ) {
-            require_once EASY_STATUS_CHECK_DIR . '../easy-admin-integration.php';
+        if ( file_exists( MY_STATUS_HUB_DIR . '../easy-admin-integration.php' ) ) {
+            require_once MY_STATUS_HUB_DIR . '../easy-admin-integration.php';
         }
         
         // Include asset manager for performance
-        if ( file_exists( EASY_STATUS_CHECK_DIR . '../easy-design-system/asset-manager.php' ) ) {
-            require_once EASY_STATUS_CHECK_DIR . '../easy-design-system/asset-manager.php';
+        if ( file_exists( MY_STATUS_HUB_DIR . '../easy-design-system/asset-manager.php' ) ) {
+            require_once MY_STATUS_HUB_DIR . '../easy-design-system/asset-manager.php';
         }
         
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-service-post-type.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-incident-tracker.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-status-history.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-service-templates.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-performance-optimizer.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-security-manager.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-database-tools.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-support-tools.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-public-status-page.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/class-public-pages.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/admin.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/status-checker.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/frontend-display.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/predefined-services.php';
-        require_once EASY_STATUS_CHECK_DIR . 'includes/ajax-handler.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-service-post-type.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-incident-tracker.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-status-history.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-service-templates.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-performance-optimizer.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-security-manager.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-database-tools.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-support-tools.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-public-status-page.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/class-public-pages.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/admin.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/status-checker.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/frontend-display.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/predefined-services.php';
+        require_once MY_STATUS_HUB_DIR . 'includes/ajax-handler.php';
     }
 
     /**
@@ -117,7 +117,7 @@ final class Easy_Status_Check {
      * Load plugin textdomain.
      */
     public function load_textdomain() {
-        load_plugin_textdomain( 'easy-status-check', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+        load_plugin_textdomain( 'my-status-hub', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     }
 
     /**
@@ -216,12 +216,12 @@ final class Easy_Status_Check {
         
         // Check if we need to migrate existing installations
         $current_version = get_option( 'esc_plugin_version', '0.0.0' );
-        if ( version_compare( $current_version, EASY_STATUS_CHECK_VERSION, '<' ) ) {
+        if ( version_compare( $current_version, MY_STATUS_HUB_VERSION, '<' ) ) {
             $this->migrate_database( $current_version );
         }
         
         // Set default options
-        update_option( 'esc_plugin_version', EASY_STATUS_CHECK_VERSION );
+        update_option( 'esc_plugin_version', MY_STATUS_HUB_VERSION );
         add_option( 'esc_activation_time', current_time( 'timestamp' ) );
         
         // Create default services
@@ -296,7 +296,7 @@ final class Easy_Status_Check {
             add_action( 'admin_notices', function() use ( $min_wp_version ) {
                 echo '<div class="notice notice-error"><p>';
                 printf( 
-                    esc_html__( 'easySTATUSCheck benötigt WordPress %s oder höher. Ihre Version: %s', 'easy-status-check' ),
+                    esc_html__( 'mySTATUShub benötigt WordPress %s oder höher. Ihre Version: %s', 'my-status-hub' ),
                     $min_wp_version,
                     $GLOBALS['wp_version']
                 );
@@ -308,7 +308,7 @@ final class Easy_Status_Check {
             add_action( 'admin_notices', function() use ( $min_php_version ) {
                 echo '<div class="notice notice-error"><p>';
                 printf( 
-                    esc_html__( 'easySTATUSCheck benötigt PHP %s oder höher. Ihre Version: %s', 'easy-status-check' ),
+                    esc_html__( 'mySTATUShub benötigt PHP %s oder höher. Ihre Version: %s', 'my-status-hub' ),
                     $min_php_version,
                     PHP_VERSION
                 );
@@ -437,7 +437,7 @@ final class Easy_Status_Check {
 add_filter( 'cron_schedules', function( $schedules ) {
     $schedules['every_five_minutes'] = array(
         'interval' => 300,
-        'display'  => __( 'Alle 5 Minuten', 'easy-status-check' )
+        'display'  => __( 'Alle 5 Minuten', 'my-status-hub' )
     );
     return $schedules;
 });
@@ -447,7 +447,7 @@ add_filter( 'cron_schedules', function( $schedules ) {
  */
 add_action( 'init', function() {
     if ( function_exists( 'easy_register_admin_ux' ) ) {
-        easy_register_admin_ux( 'easy-status-check', array(
+        easy_register_admin_ux( 'my-status-hub', array(
             'auto_save',
             'enhanced_tables', 
             'modal_forms'
@@ -458,9 +458,9 @@ add_action( 'init', function() {
 /**
  * Main function for returning the main instance of the class.
  */
-function Easy_Status_Check() {
-    return Easy_Status_Check::instance();
+function My_Status_Hub() {
+    return My_Status_Hub::get_instance();
 }
 
 // Get the plugin running.
-Easy_Status_Check();
+My_Status_Hub();

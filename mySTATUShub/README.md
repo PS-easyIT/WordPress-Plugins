@@ -1,7 +1,7 @@
-# easySTATUSCheck
+# mySTATUShub
 
-![easySTATUSCheck Logo](https://img.shields.io/badge/WordPress-Plugin-blue?style=for-the-badge&logo=wordpress)
-![Version](https://img.shields.io/badge/Version-1.1.3-green?style=for-the-badge)
+![mySTATUShub Logo](https://img.shields.io/badge/WordPress-Plugin-blue?style=for-the-badge&logo=wordpress)
+![Version](https://img.shields.io/badge/Version-1.2.1-green?style=for-the-badge)
 ![PHP](https://img.shields.io/badge/PHP-7.4+-purple?style=for-the-badge&logo=php)
 ![WordPress](https://img.shields.io/badge/WordPress-5.0+-blue?style=for-the-badge&logo=wordpress)
 
@@ -9,7 +9,7 @@ Ein professionelles WordPress-Plugin zur Überwachung von Cloud-Services, Hostin
 
 **Autor:** Andreas Hepp  
 **Webseite:** [phinit.de](https://phinit.de)  
-**Version:** 1.1.3  
+**Version:** 1.2.1  
 **Letzte Aktualisierung:** 18.01.2026
 
 ## 🌐 Live-Demo
@@ -329,13 +329,13 @@ Dieses Plugin ist unter der GPL v2 oder höher lizenziert.
 ### Lokale Entwicklung
 ```bash
 # Repository klonen
-git clone https://github.com/your-repo/easySTATUSCheck.git
+git clone https://github.com/your-repo/mySTATUShub.git
 
 # In WordPress Plugin-Verzeichnis kopieren
-cp -r easySTATUSCheck /path/to/wordpress/wp-content/plugins/
+cp -r mySTATUShub /path/to/wordpress/wp-content/plugins/
 
 # Plugin aktivieren
-wp plugin activate easySTATUSCheck
+wp plugin activate mySTATUShub
 ```
 
 ### Code-Standards
@@ -358,9 +358,29 @@ wp plugin activate easySTATUSCheck
 
 ### System-Status
 - WordPress Version, PHP Version, MySQL Version, cURL Status
-- Plugin Version: 1.1.3
+- Plugin Version: 1.2.1
 
 ## 🔄 Changelog
+
+### Version 1.2.1 (18.01.2026)
+- 🎯 **Separate Titel/Beschreibung für Incidents** - Eigene konfigurierbare Texte für Incidents-Seite
+- 🎨 **UX-Design Einstellungen verbessert** - Gruppierung in Seitentexte, Farbschema, Layout-Optionen
+- 📊 **Feed-Übersicht optimiert** - Kompakte Info-Box auf Incidents-Seite mit aktiven Quellen
+- 🔧 **PHP Fehler behoben** - isset() Checks für alle Einstellungsfelder
+- 📊 **4-Spalten History Stats** - Statistik-Cards auf History-Seite nebeneinander
+- 🛠️ **Get Pro Tab** - Neuer Einstellungs-Tab mit Link zur Pro-Version
+
+### Version 1.2.0 (18.01.2026)
+- 🎨 **Modernes UX-Design für Public Pages** - Komplett überarbeitetes Design mit modernen Animationen
+- 📊 **Status-Übersicht Box** - Live-Statistiken (Gesamt, Online, Offline, Warnung) auf Services-Seite
+- 🎛️ **Konfigurierbare Spaltenanzahl** - Services-Grid über Design-Einstellungen anpassbar (1-4 Spalten)
+- 📝 **Anpassbare Titel & Beschreibung** - Header-Box mit konfigurierbarem Titel und Beschreibung
+- 🔗 **Anklickbare CVE-Cards** - RSS Feed Items führen direkt zum Original-Artikel
+- 🎯 **3-Spalten Incidents-Grid** - Kompakteres Layout für CVE-Feeds
+- 🐛 **Feed-Anzahl Bug behoben** - max_items Einstellung wird jetzt korrekt übernommen
+- 🔧 **SQL Query optimiert** - Keine Duplikate mehr auf Public Services Page
+- 📱 **Responsive Optimierungen** - Verbesserte Mobile-Darstellung aller Public Pages
+- 🎨 **Design-System** - CSS Variables, Gradient-Backgrounds, moderne Schatten & Animationen
 
 ### Version 1.1.3 (18.01.2026)
 - 🌍 **80+ IT-Service Templates** - Massive Erweiterung auf 8 optimierte Kategorien
@@ -372,7 +392,7 @@ wp plugin activate easySTATUSCheck
 - 📊 **Template-Zähler korrigiert** - Korrekte Anzeige der Template-Anzahl
 - 🔧 **Bug-Fixes** - Parse Errors behoben, Code-Optimierungen
 
-### Version 1.0.0 (18.01.2026)
+### Version 1.0.0 (Juni 2025)
 - ✨ **Initiale Veröffentlichung**
 - 🎯 **Admin-Menü komplett überarbeitet** - Dashboard, Services, Templates, Incidents, Einstellungen
 - 📊 **3-Spalten Grid-Layout** - Moderne Card-Darstellung für Services
@@ -389,8 +409,8 @@ wp plugin activate easySTATUSCheck
 
 **Entwickelt mit ❤️ von Andreas Hepp**
 
-*easySTATUSCheck - Professionelles Service-Monitoring für WordPress*
+*mySTATUShub - Professionelles Service-Monitoring für WordPress*
 
 **Webseite:** [phinit.de](https://phinit.de)  
-**Version:** 1.1.3  
+**Version:** 1.2.1  
 **Datum:** 18.01.2026
