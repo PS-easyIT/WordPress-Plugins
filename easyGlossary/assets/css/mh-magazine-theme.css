@@ -1,0 +1,678 @@
+/**
+ * easyGlossary - MH Magazine Theme Integration
+ * 
+ * Optimierte Styles für perfekte Integration mit MH Magazine Theme v5.0.4
+ * 
+ * @package easyGlossary
+ * @version 1.3.0
+ * @theme mh-magazine v5.0.4
+ */
+
+/***** Theme Variables *****/
+:root {
+    --mh-primary: #e64946;
+    --mh-primary-hover: #d43835;
+    --mh-text: #000;
+    --mh-text-light: #666;
+    --mh-text-lighter: #9a9b97;
+    --mh-bg-white: #fff;
+    --mh-bg-light: #f7f7f7;
+    --mh-bg-gray: #f5f5f5;
+    --mh-border: #ebebeb;
+    --mh-font: 'Open Sans', Helvetica, Arial, sans-serif;
+    --mh-transition: 0.25s ease-out;
+    --mh-shadow: 0px 0px 10px rgba(50, 50, 50, 0.17);
+}
+
+/***** Glossary Links (Auto-Linking) *****/
+.easy-glossary-link {
+    color: var(--mh-primary);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--mh-primary);
+    transition: var(--mh-transition);
+    font-weight: 600;
+}
+
+.easy-glossary-link:hover {
+    color: var(--mh-primary-hover);
+    border-bottom-style: solid;
+}
+
+.easy-glossary-link.has-tooltip {
+    cursor: help;
+    position: relative;
+}
+
+/***** Glossary Archive Page *****/
+.post-type-archive-easy_glossary .mh-wrapper {
+    background: var(--mh-bg-white);
+}
+
+.glossary-archive-header {
+    background: var(--mh-bg-gray);
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 0;
+}
+
+.glossary-archive-header h1 {
+    font-family: var(--mh-font);
+    font-size: 32px;
+    font-size: 2rem;
+    color: var(--mh-text);
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.glossary-archive-description {
+    color: var(--mh-text-light);
+    font-size: 14px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+/***** A-Z Navigation *****/
+.glossary-az-nav {
+    background: var(--mh-bg-white);
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 1px solid var(--mh-border);
+    text-align: center;
+}
+
+.glossary-az-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.glossary-az-nav li {
+    margin: 0;
+}
+
+.glossary-az-nav a,
+.glossary-az-nav span {
+    display: inline-block;
+    padding: 8px 12px;
+    background: var(--mh-bg-gray);
+    color: var(--mh-text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    font-size: 0.875rem;
+    border-radius: 4px;
+    transition: var(--mh-transition);
+    min-width: 36px;
+    text-align: center;
+}
+
+.glossary-az-nav a:hover {
+    background: var(--mh-primary);
+    color: var(--mh-bg-white);
+}
+
+.glossary-az-nav a.active {
+    background: var(--mh-primary);
+    color: var(--mh-bg-white);
+}
+
+.glossary-az-nav span.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/***** Glossary List *****/
+.glossary-list {
+    background: var(--mh-bg-white);
+}
+
+.glossary-letter-group {
+    margin-bottom: 30px;
+}
+
+.glossary-letter-heading {
+    font-family: var(--mh-font);
+    font-size: 24px;
+    font-size: 1.5rem;
+    color: var(--mh-text);
+    font-weight: 700;
+    padding: 15px 20px;
+    background: var(--mh-bg-gray);
+    margin: 0 0 15px 0;
+    border-left: 5px solid var(--mh-primary);
+}
+
+.glossary-terms-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.glossary-term-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--mh-border);
+    transition: var(--mh-transition);
+}
+
+.glossary-term-item:last-child {
+    border-bottom: none;
+}
+
+.glossary-term-item:hover {
+    background: var(--mh-bg-light);
+}
+
+.glossary-term-title {
+    margin: 0 0 8px 0;
+}
+
+.glossary-term-title a {
+    color: var(--mh-text);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 18px;
+    font-size: 1.125rem;
+    transition: var(--mh-transition);
+}
+
+.glossary-term-title a:hover {
+    color: var(--mh-primary);
+}
+
+.glossary-term-excerpt {
+    color: var(--mh-text-light);
+    font-size: 14px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/***** Single Glossary Entry *****/
+.single-easy_glossary .entry-header {
+    background: var(--mh-bg-gray);
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.single-easy_glossary .entry-title {
+    font-family: var(--mh-font);
+    font-size: 32px;
+    font-size: 2rem;
+    color: var(--mh-text);
+    margin: 0;
+    font-weight: 700;
+}
+
+.single-easy_glossary .entry-content {
+    font-size: 14px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--mh-text);
+}
+
+.single-easy_glossary .entry-content p {
+    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
+}
+
+.single-easy_glossary .entry-content h2,
+.single-easy_glossary .entry-content h3,
+.single-easy_glossary .entry-content h4 {
+    font-family: var(--mh-font);
+    color: var(--mh-text);
+    font-weight: 700;
+    margin: 25px 0 15px 0;
+}
+
+.single-easy_glossary .entry-content a {
+    color: var(--mh-primary);
+    transition: var(--mh-transition);
+}
+
+.single-easy_glossary .entry-content a:hover {
+    color: var(--mh-primary-hover);
+}
+
+/***** Glossary Meta Information *****/
+.glossary-meta {
+    background: var(--mh-bg-gray);
+    padding: 20px;
+    margin: 25px 0;
+    border-left: 5px solid var(--mh-primary);
+}
+
+.glossary-meta-title {
+    font-family: var(--mh-font);
+    font-size: 16px;
+    font-size: 1rem;
+    color: var(--mh-text);
+    font-weight: 700;
+    margin: 0 0 10px 0;
+}
+
+.glossary-meta-content {
+    color: var(--mh-text-light);
+    font-size: 14px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+/***** Synonyms *****/
+.glossary-synonyms {
+    background: var(--mh-bg-light);
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.glossary-synonyms-title {
+    font-weight: 700;
+    color: var(--mh-text);
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-size: 0.875rem;
+}
+
+.glossary-synonyms-list {
+    color: var(--mh-text-light);
+    font-size: 14px;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/***** Related Terms *****/
+.glossary-related {
+    background: var(--mh-bg-white);
+    padding: 25px;
+    margin: 25px 0;
+    border: 1px solid var(--mh-border);
+}
+
+.glossary-related-title {
+    font-family: var(--mh-font);
+    font-size: 20px;
+    font-size: 1.25rem;
+    color: var(--mh-text);
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--mh-primary);
+}
+
+.glossary-related-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.glossary-related-item {
+    margin: 0;
+}
+
+.glossary-related-item a {
+    display: block;
+    padding: 10px 15px;
+    background: var(--mh-bg-gray);
+    color: var(--mh-text);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: var(--mh-transition);
+    font-size: 14px;
+    font-size: 0.875rem;
+}
+
+.glossary-related-item a:hover {
+    background: var(--mh-primary);
+    color: var(--mh-bg-white);
+}
+
+/***** Search Widget *****/
+.glossary-search-widget {
+    background: var(--mh-bg-white);
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 1px solid var(--mh-border);
+}
+
+.glossary-search-form {
+    position: relative;
+}
+
+.glossary-search-input {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 1px solid var(--mh-border);
+    border-radius: 4px;
+    font-family: var(--mh-font);
+    font-size: 14px;
+    font-size: 0.875rem;
+    transition: var(--mh-transition);
+}
+
+.glossary-search-input:focus {
+    outline: none;
+    border-color: var(--mh-primary);
+    box-shadow: 0 0 0 2px rgba(230, 73, 70, 0.1);
+}
+
+.glossary-search-button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--mh-primary);
+    color: var(--mh-bg-white);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--mh-transition);
+    font-size: 14px;
+    font-size: 0.875rem;
+}
+
+.glossary-search-button:hover {
+    background: var(--mh-primary-hover);
+}
+
+.glossary-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--mh-bg-white);
+    border: 1px solid var(--mh-border);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: var(--mh-shadow);
+    display: none;
+}
+
+.glossary-search-results.show {
+    display: block;
+}
+
+.glossary-search-result-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--mh-border);
+    cursor: pointer;
+    transition: var(--mh-transition);
+}
+
+.glossary-search-result-item:last-child {
+    border-bottom: none;
+}
+
+.glossary-search-result-item:hover {
+    background: var(--mh-bg-light);
+}
+
+.glossary-search-result-title {
+    font-weight: 700;
+    color: var(--mh-text);
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    font-size: 0.875rem;
+}
+
+.glossary-search-result-excerpt {
+    color: var(--mh-text-light);
+    font-size: 12px;
+    font-size: 0.75rem;
+    margin: 0;
+}
+
+/***** Tooltips (Theme-optimiert) *****/
+.easy-glossary-tooltip {
+    position: relative;
+    color: var(--mh-primary);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--mh-primary);
+    cursor: help;
+    transition: var(--mh-transition);
+}
+
+.easy-glossary-tooltip:hover {
+    color: var(--mh-primary-hover);
+    border-bottom-style: solid;
+}
+
+.glossary-tooltip-container {
+    position: absolute;
+    z-index: 9999;
+    background: var(--mh-bg-white);
+    border: 1px solid var(--mh-border);
+    border-radius: 4px;
+    box-shadow: var(--mh-shadow);
+    padding: 15px;
+    max-width: 320px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-family: var(--mh-font);
+}
+
+.glossary-tooltip-container.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.glossary-tooltip-container::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--mh-bg-white);
+}
+
+.tooltip-title {
+    font-family: var(--mh-font);
+    font-weight: 700;
+    color: var(--mh-text);
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-size: 1rem;
+}
+
+.tooltip-content {
+    color: var(--mh-text-light);
+    font-size: 14px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0 0 10px 0;
+}
+
+.tooltip-link {
+    color: var(--mh-primary);
+    text-decoration: none;
+    font-size: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: var(--mh-transition);
+}
+
+.tooltip-link:hover {
+    color: var(--mh-primary-hover);
+}
+
+/***** Responsive Design (MH Magazine Breakpoints) *****/
+
+/* Tablet */
+@media only screen and (max-width: 980px) {
+    .glossary-az-nav a,
+    .glossary-az-nav span {
+        padding: 6px 10px;
+        font-size: 12px;
+        font-size: 0.75rem;
+        min-width: 32px;
+    }
+    
+    .glossary-related-list {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+/* Mobile */
+@media only screen and (max-width: 767px) {
+    .glossary-archive-header,
+    .glossary-az-nav,
+    .glossary-related,
+    .glossary-search-widget {
+        padding: 15px;
+    }
+    
+    .glossary-archive-header h1 {
+        font-size: 24px;
+        font-size: 1.5rem;
+    }
+    
+    .single-easy_glossary .entry-title {
+        font-size: 24px;
+        font-size: 1.5rem;
+    }
+    
+    .glossary-letter-heading {
+        font-size: 20px;
+        font-size: 1.25rem;
+        padding: 12px 15px;
+    }
+    
+    .glossary-term-item {
+        padding: 12px 15px;
+    }
+    
+    .glossary-az-nav ul {
+        gap: 5px;
+    }
+    
+    .glossary-az-nav a,
+    .glossary-az-nav span {
+        padding: 5px 8px;
+        font-size: 11px;
+        font-size: 0.6875rem;
+        min-width: 28px;
+    }
+    
+    .glossary-related-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .glossary-tooltip-container {
+        position: fixed !important;
+        bottom: 20px !important;
+        left: 10px !important;
+        right: 10px !important;
+        top: auto !important;
+        max-width: none !important;
+    }
+    
+    .glossary-tooltip-container::before {
+        display: none;
+    }
+}
+
+/* Small Mobile */
+@media only screen and (max-width: 479px) {
+    .glossary-az-nav a,
+    .glossary-az-nav span {
+        padding: 4px 6px;
+        font-size: 10px;
+        font-size: 0.625rem;
+        min-width: 24px;
+    }
+}
+
+/***** Print Styles *****/
+@media print {
+    .glossary-az-nav,
+    .glossary-search-widget,
+    .glossary-tooltip-container {
+        display: none !important;
+    }
+    
+    .easy-glossary-link {
+        color: var(--mh-text);
+        border-bottom: none;
+        text-decoration: underline;
+    }
+}
+
+/***** Accessibility Enhancements *****/
+.glossary-skip-link {
+    position: absolute;
+    top: -9999rem;
+    left: -9999rem;
+}
+
+.glossary-skip-link:focus {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: var(--mh-primary);
+    color: var(--mh-bg-white);
+    padding: 10px 15px;
+    border-radius: 4px;
+    z-index: 10000;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+/* Screen Reader Only */
+.glossary-sr-only {
+    position: absolute;
+    top: -9999rem;
+    left: -9999rem;
+}
+
+/***** Integration mit MH Magazine Widgets *****/
+.widget_easy_glossary_search {
+    background: var(--mh-bg-white);
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.widget_easy_glossary_search .widget-title {
+    font-family: var(--mh-font);
+    font-size: 18px;
+    font-size: 1.125rem;
+    color: var(--mh-text);
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--mh-primary);
+}
+
+/***** Dark Mode Support (falls Theme Dark Mode hat) *****/
+@media (prefers-color-scheme: dark) {
+    body.dark-mode .glossary-tooltip-container {
+        background: #1d2327;
+        border-color: #50575e;
+        color: #f0f0f1;
+    }
+    
+    body.dark-mode .tooltip-title {
+        color: #f0f0f1;
+    }
+    
+    body.dark-mode .tooltip-content {
+        color: #c3c4c7;
+    }
+    
+    body.dark-mode .tooltip-link {
+        color: #72aee6;
+    }
+}

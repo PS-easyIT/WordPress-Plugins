@@ -1,0 +1,473 @@
+/**
+ * easyGlossary Frontend Styles
+ * Optimiert für MH Magazine Theme
+ * 
+ * @package easyGlossary
+ * @since 1.3.0
+ * @theme mh-magazine v5.0.4
+ */
+
+/***** Theme Integration Variables *****/
+:root {
+    --mh-primary-color: #e64946;
+    --mh-text-color: #000;
+    --mh-text-light: #666;
+    --mh-bg-white: #fff;
+    --mh-bg-light: #f7f7f7;
+    --mh-border-color: #ebebeb;
+    --mh-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    --mh-transition: 0.25s ease-out;
+}
+
+/* Glossary Tooltip Styles */
+.easy-glossary-tooltip {
+    position: relative;
+    cursor: help;
+    color: var(--mh-primary-color);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    border-bottom: none;
+}
+
+.easy-glossary-tooltip:hover {
+    color: #005177;
+}
+
+/* Tooltip Container */
+.glossary-tooltip-container {
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 15px;
+    max-width: 300px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.glossary-tooltip-container.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.glossary-tooltip-container::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #fff;
+}
+
+.glossary-tooltip-container::after {
+    content: '';
+    position: absolute;
+    top: -9px;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #c3c4c7;
+}
+
+/* Tooltip Content */
+.tooltip-title {
+    font-weight: bold;
+    color: #1d2327;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.tooltip-content {
+    color: #646970;
+    margin-bottom: 10px;
+}
+
+.tooltip-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #0073aa;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.tooltip-link:hover {
+    color: #005177;
+    text-decoration: underline;
+}
+
+.tooltip-link .dashicons {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+}
+
+/* Dark Theme Tooltip */
+.glossary-tooltip-container.dark {
+    background: #1d2327;
+    border-color: #50575e;
+    color: #f0f0f1;
+}
+
+.glossary-tooltip-container.dark::before {
+    border-bottom-color: #1d2327;
+}
+
+.glossary-tooltip-container.dark::after {
+    border-bottom-color: #50575e;
+}
+
+.glossary-tooltip-container.dark .tooltip-title {
+    color: #f0f0f1;
+}
+
+.glossary-tooltip-container.dark .tooltip-content {
+    color: #c3c4c7;
+}
+
+.glossary-tooltip-container.dark .tooltip-link {
+    color: #72aee6;
+}
+
+.glossary-tooltip-container.dark .tooltip-link:hover {
+    color: #9ec5e8;
+}
+
+/* Light Theme Tooltip */
+.glossary-tooltip-container.light {
+    background: #f6f7f7;
+    border-color: #dcdcde;
+}
+
+.glossary-tooltip-container.light::before {
+    border-bottom-color: #f6f7f7;
+}
+
+.glossary-tooltip-container.light::after {
+    border-bottom-color: #dcdcde;
+}
+
+/* Glossary Entry Styles */
+.easy-glossary-entry {
+    background: #f9f9f9;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.easy-glossary-entry h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1d2327;
+}
+
+.easy-glossary-entry h4 a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.easy-glossary-entry h4 a:hover {
+    color: #005177;
+    text-decoration: underline;
+}
+
+.glossary-content {
+    color: #646970;
+    line-height: 1.6;
+}
+
+.glossary-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Glossary Index Styles */
+.easy-glossary-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.glossary-index-entry {
+    background: #fff;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 20px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.glossary-index-entry:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.glossary-index-entry h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #1d2327;
+}
+
+.glossary-index-entry h4 a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.glossary-index-entry h4 a:hover {
+    color: #005177;
+    text-decoration: underline;
+}
+
+.glossary-index-entry p {
+    color: #646970;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .glossary-tooltip-container {
+        max-width: 250px;
+        padding: 12px;
+    }
+    
+    .easy-glossary-index {
+        grid-template-columns: 1fr;
+    }
+    
+    .easy-glossary-entry,
+    .glossary-index-entry {
+        padding: 15px;
+    }
+    
+    .tooltip-title {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .glossary-tooltip-container {
+        max-width: 200px;
+        font-size: 12px;
+    }
+    
+    .tooltip-title {
+        font-size: 13px;
+    }
+    
+    .tooltip-link {
+        font-size: 11px;
+    }
+}
+
+/* Animation for tooltip appearance */
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.glossary-tooltip-container.show {
+    animation: tooltipFadeIn 0.3s ease;
+}
+
+/* Print Styles */
+@media print {
+    .easy-glossary-tooltip {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px dotted #333;
+    }
+    
+    .glossary-tooltip-container {
+        display: none !important;
+    }
+    
+    .easy-glossary-entry,
+    .glossary-index-entry {
+        border: 1px solid #333;
+        background: transparent;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .easy-glossary-tooltip {
+        color: #000;
+        text-decoration: underline;
+        text-decoration-style: solid;
+    }
+    
+    .glossary-tooltip-container {
+        background: #fff;
+        border: 2px solid #000;
+        box-shadow: none;
+    }
+    
+    .tooltip-title {
+        color: #000;
+    }
+    
+    .tooltip-content {
+        color: #333;
+    }
+    
+    .tooltip-link {
+        color: #000;
+        text-decoration: underline;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .easy-glossary-tooltip,
+    .glossary-tooltip-container,
+    .glossary-index-entry {
+        transition: none;
+        animation: none;
+    }
+    
+    .glossary-index-entry:hover {
+        transform: none;
+    }
+}
+
+/* Focus Styles for Accessibility */
+.easy-glossary-tooltip:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+.glossary-index-entry h4 a:focus,
+.easy-glossary-entry h4 a:focus,
+.tooltip-link:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* A-Z Navigation Shortcode - Minimal Design-Neutral Styles */
+.glossary-az-container {
+    margin: 2rem 0;
+}
+
+.glossary-az-nav {
+    margin-bottom: 2rem;
+}
+
+.glossary-az-letters {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.letter-item {
+    display: inline-block;
+}
+
+.letter-link {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.letter-link.has-terms {
+    cursor: pointer;
+}
+
+.letter-link.no-terms {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.letter-link.active {
+    font-weight: bold;
+}
+
+.letter-count {
+    font-size: 0.85em;
+    opacity: 0.7;
+}
+
+.glossary-az-content {
+    margin-top: 2rem;
+}
+
+.glossary-letter-section {
+    margin-bottom: 2rem;
+}
+
+.glossary-letter-heading {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid currentColor;
+}
+
+.glossary-terms-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+}
+
+.glossary-term-item {
+    margin: 0;
+}
+
+.glossary-term-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.glossary-term-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design für A-Z Navigation */
+@media (max-width: 768px) {
+    .glossary-az-letters {
+        justify-content: center;
+    }
+    
+    .glossary-terms-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .letter-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+    }
+    
+    .glossary-letter-heading {
+        font-size: 1.25rem;
+    }
+}
