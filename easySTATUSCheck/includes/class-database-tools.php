@@ -15,6 +15,7 @@ class ESC_Database_Tools {
         add_action( 'wp_ajax_esc_check_tables', array( $this, 'ajax_check_tables' ) );
         add_action( 'wp_ajax_esc_create_tables', array( $this, 'ajax_create_tables' ) );
         add_action( 'wp_ajax_esc_repair_tables', array( $this, 'ajax_repair_tables' ) );
+        add_action( 'wp_ajax_esc_reset_tables', array( $this, 'ajax_reset_tables' ) );
         add_action( 'wp_ajax_esc_clear_errors', array( $this, 'ajax_clear_errors' ) );
     }
     
@@ -259,6 +260,49 @@ class ESC_Database_Tools {
     }
 
     /**
+     * Reset all tables (DELETE - removes all data)
+     */
+    public function reset_all_tables() {
+        global $wpdb;
+        
+        $tables = $this->get_required_tables();
+        $reset = array();
+        $errors = array();
+        
+        // Disable foreign key checks temporarily
+        $wpdb->query( "SET FOREIGN_KEY_CHECKS = 0" );
+        
+        // Delete in reverse order to respect foreign keys
+        $table_order = array( 'notifications', 'logs', 'incidents', 'services' );
+        
+        foreach ( $table_order as $key ) {
+            if ( isset( $tables[$key] ) && $this->table_exists( $tables[$key]['name'] ) ) {
+                // Use DELETE instead of TRUNCATE to avoid foreign key issues
+                $result = $wpdb->query( "DELETE FROM {$tables[$key]['name']}" );
+                
+                if ( $result !== false ) {
+                    $reset[] = $key;
+                    // Reset auto increment
+                    $wpdb->query( "ALTER TABLE {$tables[$key]['name']} AUTO_INCREMENT = 1" );
+                } else {
+                    $errors[] = array(
+                        'table' => $key,
+                        'error' => $wpdb->last_error
+                    );
+                }
+            }
+        }
+        
+        // Re-enable foreign key checks
+        $wpdb->query( "SET FOREIGN_KEY_CHECKS = 1" );
+        
+        return array(
+            'reset' => $reset,
+            'errors' => $errors,
+        );
+    }
+
+    /**
      * AJAX: Check tables status
      */
     public function ajax_check_tables() {
@@ -326,6 +370,53 @@ class ESC_Database_Tools {
                 count( $repaired )
             ),
             'repaired' => $repaired,
+        ) );
+    }
+
+    /**
+     * AJAX: Reset all tables (DELETE)
+     */
+    public function ajax_reset_tables() {
+        check_ajax_referer( 'esc_admin_nonce', 'nonce' );
+        
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Keine Berechtigung', 'easy-status-check' ) ) );
+        }
+        
+        // Additional security check - require confirmation
+        if ( ! isset( $_POST['confirm'] ) || $_POST['confirm'] !== 'RESET' ) {
+            wp_send_json_error( array( 'message' => __( 'Bestätigung erforderlich. Bitte geben Sie "RESET" ein.', 'easy-status-check' ) ) );
+        }
+        
+        $result = $this->reset_all_tables();
+        
+        if ( ! empty( $result['errors'] ) ) {
+            $error_details = '';
+            foreach ( $result['errors'] as $error ) {
+                if ( is_array( $error ) ) {
+                    $error_details .= sprintf( '%s: %s; ', $error['table'], $error['error'] );
+                } else {
+                    $error_details .= $error . '; ';
+                }
+            }
+            
+            wp_send_json_error( array(
+                'message' => sprintf(
+                    __( 'Fehler beim Zurücksetzen von %d Tabelle(n). Details: %s', 'easy-status-check' ),
+                    count( $result['errors'] ),
+                    $error_details
+                ),
+                'reset' => $result['reset'],
+                'errors' => $result['errors'],
+            ) );
+        }
+        
+        wp_send_json_success( array(
+            'message' => sprintf(
+                __( '%d Tabelle(n) erfolgreich zurückgesetzt. Alle Daten wurden gelöscht.', 'easy-status-check' ),
+                count( $result['reset'] )
+            ),
+            'reset' => $result['reset'],
         ) );
     }
 }

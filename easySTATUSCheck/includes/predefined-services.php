@@ -39,7 +39,7 @@ class ESC_Predefined_Services {
                     'expected_code' => '200',
                     'timeout' => 15,
                     'response_type' => 'json',
-                    'json_path' => 'incidents'
+                    'check_content' => false
                 ),
                 array(
                     'name' => 'Google Workspace Status',
@@ -238,6 +238,86 @@ class ESC_Predefined_Services {
                 array(
                     'name' => 'Bluehost Status',
                     'url' => 'https://www.bluehost.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // STRATO
+                array(
+                    'name' => 'STRATO',
+                    'url' => 'https://www.strato.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // 1&1 IONOS
+                array(
+                    'name' => '1&1 IONOS',
+                    'url' => 'https://www.ionos.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // ALL-INKL
+                array(
+                    'name' => 'ALL-INKL.COM',
+                    'url' => 'https://all-inkl.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // Host Europe
+                array(
+                    'name' => 'Host Europe',
+                    'url' => 'https://www.hosteurope.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // netcup
+                array(
+                    'name' => 'netcup',
+                    'url' => 'https://www.netcup.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // Mittwald
+                array(
+                    'name' => 'Mittwald',
+                    'url' => 'https://www.mittwald.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // dogado
+                array(
+                    'name' => 'dogado',
+                    'url' => 'https://www.dogado.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // Alfahosting
+                array(
+                    'name' => 'Alfahosting',
+                    'url' => 'https://alfahosting.de',
                     'category' => 'hosting',
                     'method' => 'GET',
                     'expected_code' => '200',

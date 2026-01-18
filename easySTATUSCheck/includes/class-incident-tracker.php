@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ESC_Incident_Tracker {
 
     public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_incident_pages' ), 20 );
+        add_action( 'admin_menu', array( $this, 'add_incident_pages' ), 25 ); // Position 5
         add_action( 'esc_status_changed', array( $this, 'handle_status_change' ), 10, 3 );
         add_action( 'wp_ajax_esc_resolve_incident', array( $this, 'ajax_resolve_incident' ) );
         add_action( 'wp_ajax_esc_create_incident', array( $this, 'ajax_create_incident' ) );
@@ -245,16 +245,8 @@ class ESC_Incident_Tracker {
     }
 
     public function render_incidents_page() {
-        global $wpdb;
-        
         // Handle settings save
-        if ( isset( $_POST['esc_save_public_status'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'esc_public_status_settings' ) ) {
-            update_option( 'esc_public_status_enabled', isset( $_POST['public_status_enabled'] ) ? 1 : 0 );
-            update_option( 'esc_public_status_slug', sanitize_title( $_POST['public_status_slug'] ) );
-            update_option( 'esc_public_status_title', sanitize_text_field( $_POST['public_status_title'] ) );
-            update_option( 'esc_public_status_description', sanitize_textarea_field( $_POST['public_status_description'] ) );
-            update_option( 'esc_public_status_show_cve', isset( $_POST['public_status_show_cve'] ) ? 1 : 0 );
-            
+        if ( isset( $_POST['esc_save_public_incidents'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'esc_public_incidents_settings' ) ) {
             // Save CVE feeds
             $cve_feeds = array();
             if ( isset( $_POST['cve_feed_name'] ) && is_array( $_POST['cve_feed_name'] ) ) {
@@ -268,164 +260,45 @@ class ESC_Incident_Tracker {
                 }
             }
             update_option( 'esc_cve_feeds', $cve_feeds );
-            
-            flush_rewrite_rules();
+            update_option( 'esc_public_cve_max_items', intval( $_POST['cve_max_items'] ?? 10 ) );
             
             echo '<div class="notice notice-success"><p>' . __( 'Einstellungen gespeichert.', 'easy-status-check' ) . '</p></div>';
         }
         
-        $filter = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'active';
-        
-        $incidents_table = $wpdb->prefix . 'esc_incidents';
-        
-        $where = '';
-        if ( $filter === 'active' ) {
-            $where = 'WHERE resolved_at IS NULL';
-        } elseif ( $filter === 'resolved' ) {
-            $where = 'WHERE resolved_at IS NOT NULL';
-        }
-        
-        $incidents = $wpdb->get_results( "SELECT * FROM $incidents_table $where ORDER BY started_at DESC LIMIT 50" );
-        
         // Get settings
         $public_enabled = get_option( 'esc_public_status_enabled', false );
         $public_slug = get_option( 'esc_public_status_slug', 'status' );
-        $public_title = get_option( 'esc_public_status_title', __( 'System Status', 'easy-status-check' ) );
-        $public_description = get_option( 'esc_public_status_description', __( 'Aktuelle Status-Informationen unserer Services', 'easy-status-check' ) );
-        $show_cve = get_option( 'esc_public_status_show_cve', true );
         $cve_feeds = get_option( 'esc_cve_feeds', array() );
+        $cve_max_items = get_option( 'esc_public_cve_max_items', 10 );
         
         ?>
         <div class="wrap">
-            <h1><?php _e( 'Incident-Tracking & Public Status Page', 'easy-status-check' ); ?></h1>
+            <h1><?php _e( 'Public Incidents Page - Einstellungen', 'easy-status-check' ); ?></h1>
+            <p class="description"><?php _e( 'Konfigurieren Sie die öffentliche Incidents-Seite mit CVE RSS Feeds für Sicherheitswarnungen.', 'easy-status-check' ); ?></p>
             
-            <h2 class="nav-tab-wrapper">
-                <a href="#incidents" class="nav-tab nav-tab-active" data-tab="incidents"><?php _e( 'Incidents', 'easy-status-check' ); ?></a>
-                <a href="#public-status" class="nav-tab" data-tab="public-status"><?php _e( 'Public Status Page', 'easy-status-check' ); ?></a>
-            </h2>
-            
-            <!-- Incidents Tab -->
-            <div id="tab-incidents" class="tab-content">
-                <div class="esc-incident-filters">
-                    <a href="?page=easy-status-check-incidents&filter=all" class="button <?php echo $filter === 'all' ? 'button-primary' : ''; ?>">
-                        <?php _e( 'Alle', 'easy-status-check' ); ?>
-                    </a>
-                    <a href="?page=easy-status-check-incidents&filter=active" class="button <?php echo $filter === 'active' ? 'button-primary' : ''; ?>">
-                        <?php _e( 'Aktiv', 'easy-status-check' ); ?>
-                    </a>
-                    <a href="?page=easy-status-check-incidents&filter=resolved" class="button <?php echo $filter === 'resolved' ? 'button-primary' : ''; ?>">
-                        <?php _e( 'Behoben', 'easy-status-check' ); ?>
-                    </a>
+            <?php if ( $public_enabled ) : ?>
+                <div class="notice notice-info">
+                    <p>
+                        <strong><?php _e( 'Ihre Public Incidents Page:', 'easy-status-check' ); ?></strong>
+                        <a href="<?php echo home_url( '/' . $public_slug . '/incidents' ); ?>" target="_blank" class="button button-secondary">
+                            <span class="dashicons dashicons-external" style="margin-top: 3px;"></span>
+                            <?php echo home_url( '/' . $public_slug . '/incidents' ); ?>
+                        </a>
+                    </p>
                 </div>
-                
-                <table class="wp-list-table widefat fixed striped">
-                    <thead>
-                        <tr>
-                            <th><?php _e( 'Service', 'easy-status-check' ); ?></th>
-                            <th><?php _e( 'Schweregrad', 'easy-status-check' ); ?></th>
-                            <th><?php _e( 'Titel', 'easy-status-check' ); ?></th>
-                            <th><?php _e( 'Beginn', 'easy-status-check' ); ?></th>
-                            <th><?php _e( 'Ende', 'easy-status-check' ); ?></th>
-                            <th><?php _e( 'Dauer', 'easy-status-check' ); ?></th>
-                            <th><?php _e( 'Status', 'easy-status-check' ); ?></th>
-                            <th><?php _e( 'Aktionen', 'easy-status-check' ); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ( empty( $incidents ) ) : ?>
-                            <tr>
-                                <td colspan="8"><?php _e( 'Keine Incidents gefunden.', 'easy-status-check' ); ?></td>
-                            </tr>
-                        <?php else : ?>
-                            <?php foreach ( $incidents as $incident ) : ?>
-                                <?php
-                                $services_table = $wpdb->prefix . 'esc_services';
-                                $service = $wpdb->get_row( $wpdb->prepare(
-                                    "SELECT * FROM $services_table WHERE id = %d",
-                                    $incident->service_id
-                                ) );
-                                $severity_class = 'esc-severity-' . $incident->severity;
-                                $is_active = is_null( $incident->resolved_at );
-                                ?>
-                                <tr class="<?php echo esc_attr( $severity_class ); ?>">
-                                    <td>
-                                        <strong><?php echo esc_html( $service ? $service->name : __( 'Unbekannt', 'easy-status-check' ) ); ?></strong>
-                                    </td>
-                                    <td>
-                                        <span class="esc-severity-badge esc-severity-<?php echo esc_attr( $incident->severity ); ?>">
-                                            <?php echo esc_html( strtoupper( $incident->severity ) ); ?>
-                                        </span>
-                                    </td>
-                                    <td><?php echo esc_html( $incident->title ); ?></td>
-                                    <td><?php echo esc_html( $incident->started_at ); ?></td>
-                                    <td><?php echo $incident->resolved_at ? esc_html( $incident->resolved_at ) : '—'; ?></td>
-                                    <td><?php echo $incident->duration ? esc_html( $this->format_duration( $incident->duration ) ) : '—'; ?></td>
-                                    <td>
-                                        <?php if ( $is_active ) : ?>
-                                            <span class="esc-status-badge esc-status-active"><?php _e( 'Aktiv', 'easy-status-check' ); ?></span>
-                                        <?php else : ?>
-                                            <span class="esc-status-badge esc-status-resolved"><?php _e( 'Behoben', 'easy-status-check' ); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ( $is_active ) : ?>
-                                            <button class="button button-small esc-resolve-incident" data-incident-id="<?php echo esc_attr( $incident->id ); ?>">
-                                                <?php _e( 'Beheben', 'easy-status-check' ); ?>
-                                            </button>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+            <?php endif; ?>
             
-            <!-- Public Status Page Tab -->
-            <div id="tab-public-status" class="tab-content" style="display: none;">
+            <div class="esc-incidents-settings">
                 <form method="post" action="">
-                    <?php wp_nonce_field( 'esc_public_status_settings' ); ?>
-                    <input type="hidden" name="esc_save_public_status" value="1">
+                    <?php wp_nonce_field( 'esc_public_incidents_settings' ); ?>
+                    <input type="hidden" name="esc_save_public_incidents" value="1">
                     
                     <table class="form-table">
                         <tr>
-                            <th scope="row"><?php _e( 'Public Status Page aktivieren', 'easy-status-check' ); ?></th>
+                            <th scope="row"><?php _e( 'Maximale Anzahl CVE-Items', 'easy-status-check' ); ?></th>
                             <td>
-                                <label>
-                                    <input type="checkbox" name="public_status_enabled" value="1" <?php checked( $public_enabled ); ?>>
-                                    <?php _e( 'Öffentliche Status-Seite aktivieren', 'easy-status-check' ); ?>
-                                </label>
-                                <p class="description"><?php _e( 'Erstellt eine öffentlich zugängliche Status-Seite für Ihre Services', 'easy-status-check' ); ?></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row"><?php _e( 'URL-Slug', 'easy-status-check' ); ?></th>
-                            <td>
-                                <input type="text" name="public_status_slug" value="<?php echo esc_attr( $public_slug ); ?>" class="regular-text">
-                                <p class="description">
-                                    <?php printf( __( 'Die Status-Seite wird unter %s erreichbar sein', 'easy-status-check' ), '<code>' . home_url( '/' ) . esc_html( $public_slug ) . '</code>' ); ?>
-                                </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row"><?php _e( 'Seitentitel', 'easy-status-check' ); ?></th>
-                            <td>
-                                <input type="text" name="public_status_title" value="<?php echo esc_attr( $public_title ); ?>" class="regular-text">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row"><?php _e( 'Beschreibung', 'easy-status-check' ); ?></th>
-                            <td>
-                                <textarea name="public_status_description" rows="3" class="large-text"><?php echo esc_textarea( $public_description ); ?></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row"><?php _e( 'CVE-Feeds anzeigen', 'easy-status-check' ); ?></th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="public_status_show_cve" value="1" <?php checked( $show_cve ); ?>>
-                                    <?php _e( 'Sicherheitswarnungen (CVE) auf der Status-Seite anzeigen', 'easy-status-check' ); ?>
-                                </label>
+                                <input type="number" name="cve_max_items" value="<?php echo esc_attr( $cve_max_items ); ?>" min="5" max="50" class="small-text">
+                                <p class="description"><?php _e( 'Wie viele CVE-Items pro Feed auf der öffentlichen Incidents-Seite angezeigt werden sollen (5-50)', 'easy-status-check' ); ?></p>
                             </td>
                         </tr>
                     </table>
@@ -464,85 +337,20 @@ class ESC_Incident_Tracker {
                         <button type="button" class="button" id="esc-add-cve-feed"><?php _e( 'Feed hinzufügen', 'easy-status-check' ); ?></button>
                     </p>
                     
-                    <?php submit_button(); ?>
+                    <?php submit_button( __( 'Einstellungen speichern', 'easy-status-check' ) ); ?>
                 </form>
-                
-                <?php if ( $public_enabled ) : ?>
-                    <div class="notice notice-info">
-                        <p>
-                            <strong><?php _e( 'Ihre Public Status Page:', 'easy-status-check' ); ?></strong>
-                            <a href="<?php echo home_url( '/' . $public_slug ); ?>" target="_blank"><?php echo home_url( '/' . $public_slug ); ?></a>
-                        </p>
-                    </div>
-                <?php endif; ?>
             </div>
         </div>
         
         <style>
-            .nav-tab-wrapper { margin-bottom: 20px; }
-            .tab-content { display: none; }
-            .tab-content.active { display: block; }
-            .esc-incident-filters { margin: 20px 0; }
-            .esc-incident-filters .button { margin-right: 5px; }
-            .esc-severity-badge {
-                display: inline-block;
-                padding: 3px 8px;
-                border-radius: 3px;
-                font-size: 11px;
-                font-weight: bold;
-            }
-            .esc-severity-minor { background: #fff3cd; color: #856404; }
-            .esc-severity-major { background: #f8d7da; color: #721c24; }
-            .esc-severity-critical { background: #721c24; color: #fff; }
-            .esc-status-badge {
-                display: inline-block;
-                padding: 3px 8px;
-                border-radius: 3px;
-                font-size: 11px;
-            }
-            .esc-status-active { background: #f8d7da; color: #721c24; }
-            .esc-status-resolved { background: #d4edda; color: #155724; }
+            .esc-incidents-settings { background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px; margin-top: 20px; }
             #esc-cve-feeds-table input { width: 100%; }
+            .notice.notice-info { margin: 20px 0; }
+            .notice.notice-info .button { margin-left: 10px; vertical-align: middle; }
         </style>
         
         <script>
         jQuery(document).ready(function($) {
-            // Tab switching
-            $('.nav-tab').on('click', function(e) {
-                e.preventDefault();
-                var tab = $(this).data('tab');
-                
-                $('.nav-tab').removeClass('nav-tab-active');
-                $(this).addClass('nav-tab-active');
-                
-                $('.tab-content').hide();
-                $('#tab-' + tab).show();
-            });
-            
-            // Resolve incident
-            $('.esc-resolve-incident').on('click', function() {
-                var button = $(this);
-                var incidentId = button.data('incident-id');
-                
-                if (!confirm('<?php _e( 'Möchten Sie diesen Incident als behoben markieren?', 'easy-status-check' ); ?>')) {
-                    return;
-                }
-                
-                button.prop('disabled', true);
-                
-                $.post(ajaxurl, {
-                    action: 'esc_resolve_incident',
-                    incident_id: incidentId,
-                    nonce: '<?php echo wp_create_nonce( 'esc_resolve_incident' ); ?>'
-                }, function(response) {
-                    if (response.success) {
-                        location.reload();
-                    } else {
-                        alert(response.data.message);
-                        button.prop('disabled', false);
-                    }
-                });
-            });
             
             // Add CVE feed
             $('#esc-add-cve-feed').on('click', function() {

@@ -12,44 +12,68 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ESC_Public_Status_Page {
 
     public function __construct() {
-        add_action( 'init', array( $this, 'register_status_page' ) );
-        add_action( 'template_redirect', array( $this, 'handle_status_page' ) );
+        // DEPRECATED: Diese Klasse wird nicht mehr für Public Pages verwendet
+        // ESC_Public_Pages übernimmt jetzt die Verwaltung der öffentlichen Seiten
+        // Rewrite-Rules werden weiterhin registriert, aber handle_public_pages() ist deaktiviert
+        add_action( 'init', array( $this, 'register_public_pages' ) );
+        // add_action( 'template_redirect', array( $this, 'handle_public_pages' ) ); // DEAKTIVIERT
         add_shortcode( 'esc_public_status', array( $this, 'render_status_shortcode' ) );
         add_action( 'wp_ajax_nopriv_esc_get_cve_feeds', array( $this, 'ajax_get_cve_feeds' ) );
         add_action( 'wp_ajax_esc_get_cve_feeds', array( $this, 'ajax_get_cve_feeds' ) );
     }
 
     /**
-     * Register virtual status page
+     * Register all public pages
      */
-    public function register_status_page() {
+    public function register_public_pages() {
         $enabled = get_option( 'esc_public_status_enabled', false );
         
         if ( ! $enabled ) {
             return;
         }
         
-        $slug = get_option( 'esc_public_status_slug', 'status' );
+        $base_slug = get_option( 'esc_public_status_slug', 'status' );
         
+        // Public Services Status Page
         add_rewrite_rule(
-            '^' . $slug . '/?$',
-            'index.php?esc_status_page=1',
+            '^' . $base_slug . '/services/?$',
+            'index.php?esc_public_page=services',
             'top'
         );
         
-        add_rewrite_tag( '%esc_status_page%', '([^&]+)' );
+        // Public Incidents/CVE Page
+        add_rewrite_rule(
+            '^' . $base_slug . '/incidents/?$',
+            'index.php?esc_public_page=incidents',
+            'top'
+        );
+        
+        // Public History Page with service parameter
+        add_rewrite_rule(
+            '^' . $base_slug . '/history/([0-9]+)/?$',
+            'index.php?esc_public_page=history&service_id=$matches[1]',
+            'top'
+        );
+        
+        // Legacy main status page (redirect to services)
+        add_rewrite_rule(
+            '^' . $base_slug . '/?$',
+            'index.php?esc_public_page=services',
+            'top'
+        );
+        
+        add_rewrite_tag( '%esc_public_page%', '([^&]+)' );
+        add_rewrite_tag( '%service_id%', '([0-9]+)' );
     }
 
     /**
-     * Handle status page display
+     * Handle public pages display
      */
-    public function handle_status_page() {
-        if ( ! get_query_var( 'esc_status_page' ) ) {
-            return;
-        }
-        
-        $this->render_public_status_page();
-        exit;
+    public function handle_public_pages() {
+        // Diese Klasse wird nicht mehr für Public Pages verwendet
+        // Alle Public Pages werden jetzt von ESC_Public_Pages verwaltet
+        // Diese Methode bleibt leer für Rückwärtskompatibilität
+        return;
     }
 
     /**
@@ -67,36 +91,52 @@ class ESC_Public_Status_Page {
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <title><?php echo esc_html( get_option( 'esc_public_status_title', __( 'System Status', 'easy-status-check' ) ) ); ?></title>
             <?php wp_head(); ?>
+            <?php
+            // Get public settings
+            $public_settings = get_option( 'esc_public_settings', array(
+                'primary_color' => '#2271b1',
+                'success_color' => '#00a32a',
+                'warning_color' => '#f0b849',
+                'error_color' => '#d63638',
+                'background_color' => '#f0f0f1',
+                'text_color' => '#1d2327'
+            ) );
+            ?>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+                body { 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+                    background: <?php echo esc_attr( $public_settings['background_color'] ); ?>; 
+                    color: <?php echo esc_attr( $public_settings['text_color'] ); ?>; 
+                    line-height: 1.6; 
+                }
                 .status-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
                 .status-header { text-align: center; margin-bottom: 50px; }
-                .status-header h1 { font-size: 36px; margin-bottom: 10px; color: #1a1a1a; }
+                .status-header h1 { font-size: 36px; margin-bottom: 10px; color: <?php echo esc_attr( $public_settings['text_color'] ); ?>; }
                 .status-header p { color: #666; font-size: 18px; }
                 .overall-status { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 40px; text-align: center; }
-                .overall-status.operational { border-top: 4px solid #28a745; }
-                .overall-status.issues { border-top: 4px solid #ffc107; }
-                .overall-status.down { border-top: 4px solid #dc3545; }
+                .overall-status.operational { border-top: 4px solid <?php echo esc_attr( $public_settings['success_color'] ); ?>; }
+                .overall-status.issues { border-top: 4px solid <?php echo esc_attr( $public_settings['warning_color'] ); ?>; }
+                .overall-status.down { border-top: 4px solid <?php echo esc_attr( $public_settings['error_color'] ); ?>; }
                 .overall-status h2 { font-size: 28px; margin-bottom: 10px; }
                 .overall-status .status-icon { font-size: 48px; margin-bottom: 15px; }
                 .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-bottom: 40px; }
                 .service-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #ddd; }
-                .service-card.online { border-left-color: #28a745; }
-                .service-card.offline { border-left-color: #dc3545; }
-                .service-card.warning { border-left-color: #ffc107; }
+                .service-card.online { border-left-color: <?php echo esc_attr( $public_settings['success_color'] ); ?>; }
+                .service-card.offline { border-left-color: <?php echo esc_attr( $public_settings['error_color'] ); ?>; }
+                .service-card.warning { border-left-color: <?php echo esc_attr( $public_settings['warning_color'] ); ?>; }
                 .service-card h3 { font-size: 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
                 .service-card .status-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
-                .service-card .status-badge.online { background: #d4edda; color: #155724; }
-                .service-card .status-badge.offline { background: #f8d7da; color: #721c24; }
-                .service-card .status-badge.warning { background: #fff3cd; color: #856404; }
+                .service-card .status-badge.online { background: <?php echo esc_attr( $public_settings['success_color'] ); ?>22; color: <?php echo esc_attr( $public_settings['success_color'] ); ?>; }
+                .service-card .status-badge.offline { background: <?php echo esc_attr( $public_settings['error_color'] ); ?>22; color: <?php echo esc_attr( $public_settings['error_color'] ); ?>; }
+                .service-card .status-badge.warning { background: <?php echo esc_attr( $public_settings['warning_color'] ); ?>22; color: <?php echo esc_attr( $public_settings['warning_color'] ); ?>; }
                 .service-meta { font-size: 14px; color: #666; margin-top: 10px; }
                 .cve-section { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 40px; }
-                .cve-section h2 { font-size: 24px; margin-bottom: 20px; color: #1a1a1a; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+                .cve-section h2 { font-size: 24px; margin-bottom: 20px; color: <?php echo esc_attr( $public_settings['text_color'] ); ?>; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
                 .cve-feed { margin-bottom: 30px; }
                 .cve-feed h3 { font-size: 18px; margin-bottom: 15px; color: #495057; }
-                .cve-item { padding: 15px; background: #f8f9fa; border-left: 3px solid #dc3545; margin-bottom: 10px; border-radius: 4px; }
-                .cve-item h4 { font-size: 16px; margin-bottom: 5px; color: #dc3545; }
+                .cve-item { padding: 15px; background: #f8f9fa; border-left: 3px solid <?php echo esc_attr( $public_settings['error_color'] ); ?>; margin-bottom: 10px; border-radius: 4px; }
+                .cve-item h4 { font-size: 16px; margin-bottom: 5px; color: <?php echo esc_attr( $public_settings['error_color'] ); ?>; }
                 .cve-item .cve-date { font-size: 12px; color: #6c757d; margin-bottom: 8px; }
                 .cve-item p { font-size: 14px; color: #495057; }
                 .footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid #e9ecef; color: #6c757d; font-size: 14px; }

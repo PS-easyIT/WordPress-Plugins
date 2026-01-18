@@ -36,7 +36,7 @@ class ESC_Service_Post_Type {
             'search_items'          => __( 'Services durchsuchen', 'easy-status-check' ),
             'not_found'             => __( 'Keine Services gefunden', 'easy-status-check' ),
             'not_found_in_trash'    => __( 'Keine Services im Papierkorb', 'easy-status-check' ),
-            'all_items'             => __( 'Alle Services', 'easy-status-check' ),
+            'all_items'             => __( 'Services', 'easy-status-check' ),
         );
 
         $args = array(
@@ -44,7 +44,7 @@ class ESC_Service_Post_Type {
             'public'                => true,
             'publicly_queryable'    => true,
             'show_ui'               => true,
-            'show_in_menu'          => 'easy-status-check',
+            'show_in_menu'          => false, // Komplett aus Admin-Menü entfernen
             'query_var'             => true,
             'rewrite'               => array( 'slug' => 'service' ),
             'capability_type'       => 'post',

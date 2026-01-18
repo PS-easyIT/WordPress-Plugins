@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ESC_Status_History {
 
     public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_history_page' ), 20 );
+        add_action( 'admin_menu', array( $this, 'add_history_page' ), 15 ); // Position 3
         add_action( 'wp_ajax_esc_get_history_data', array( $this, 'ajax_get_history_data' ) );
         add_action( 'admin_init', array( $this, 'handle_csv_export' ) );
         add_action( 'wp_ajax_esc_export_history', array( $this, 'ajax_export_history' ) );
@@ -37,66 +37,66 @@ class ESC_Status_History {
      */
     public function render_history_page() {
         global $wpdb;
+        
+        // Handle settings save
+        if ( isset( $_POST['esc_save_history_settings'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'esc_history_settings' ) ) {
+            update_option( 'esc_history_period', sanitize_text_field( $_POST['history_period'] ) );
+            echo '<div class="notice notice-success"><p>' . __( 'Einstellungen gespeichert.', 'easy-status-check' ) . '</p></div>';
+        }
+        
         $services_table = $wpdb->prefix . 'esc_services';
         $services = $wpdb->get_results( "SELECT * FROM $services_table WHERE enabled = 1 ORDER BY name ASC" );
-
-        $selected_service = isset( $_GET['service_id'] ) ? intval( $_GET['service_id'] ) : 0;
-        $period = isset( $_GET['period'] ) ? sanitize_text_field( $_GET['period'] ) : '24h';
+        $period = get_option( 'esc_history_period', '24h' );
         
         ?>
         <div class="wrap">
-            <h1><?php _e( 'Status-History', 'easy-status-check' ); ?></h1>
+            <h1><?php _e( 'Status-History - Alle Services', 'easy-status-check' ); ?></h1>
+            <p class="description"><?php _e( 'Übersicht der Status-Verläufe aller aktivierten Services als Graph Cards.', 'easy-status-check' ); ?></p>
             
-            <div class="esc-history-filters">
-                <select id="esc-service-select" class="regular-text">
-                    <option value=""><?php _e( 'Service auswählen', 'easy-status-check' ); ?></option>
-                    <?php foreach ( $services as $service ) : ?>
-                        <option value="<?php echo esc_attr( $service->id ); ?>" <?php selected( $selected_service, $service->id ); ?>>
-                            <?php echo esc_html( $service->name ); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                
-                <select id="esc-period-select" class="regular-text">
-                    <option value="24h" <?php selected( $period, '24h' ); ?>><?php _e( 'Letzte 24 Stunden', 'easy-status-check' ); ?></option>
-                    <option value="7d" <?php selected( $period, '7d' ); ?>><?php _e( 'Letzte 7 Tage', 'easy-status-check' ); ?></option>
-                    <option value="30d" <?php selected( $period, '30d' ); ?>><?php _e( 'Letzte 30 Tage', 'easy-status-check' ); ?></option>
-                    <option value="90d" <?php selected( $period, '90d' ); ?>><?php _e( 'Letzte 90 Tage', 'easy-status-check' ); ?></option>
-                </select>
-                
-                <button id="esc-load-history" class="button button-primary"><?php _e( 'Laden', 'easy-status-check' ); ?></button>
-                <button id="esc-export-history" class="button"><?php _e( 'Als CSV exportieren', 'easy-status-check' ); ?></button>
+            <div class="esc-history-settings">
+                <form method="post" action="" style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; border-radius: 4px; margin: 20px 0;">
+                    <?php wp_nonce_field( 'esc_history_settings' ); ?>
+                    <input type="hidden" name="esc_save_history_settings" value="1">
+                    
+                    <label for="history-period" style="font-weight: 600; margin-right: 10px;"><?php _e( 'History-Zeitraum für alle Cards:', 'easy-status-check' ); ?></label>
+                    <select id="history-period" name="history_period" class="regular-text">
+                        <option value="24h" <?php selected( $period, '24h' ); ?>><?php _e( 'Letzte 24 Stunden', 'easy-status-check' ); ?></option>
+                        <option value="7d" <?php selected( $period, '7d' ); ?>><?php _e( 'Letzte 7 Tage', 'easy-status-check' ); ?></option>
+                        <option value="30d" <?php selected( $period, '30d' ); ?>><?php _e( 'Letzte 30 Tage', 'easy-status-check' ); ?></option>
+                        <option value="90d" <?php selected( $period, '90d' ); ?>><?php _e( 'Letzte 90 Tage', 'easy-status-check' ); ?></option>
+                    </select>
+                    <?php submit_button( __( 'Zeitraum speichern', 'easy-status-check' ), 'primary', 'submit', false ); ?>
+                </form>
             </div>
             
-            <?php if ( $selected_service ) : ?>
-                <div class="esc-history-stats">
-                    <div class="esc-stat-box">
-                        <h3><?php _e( 'Uptime', 'easy-status-check' ); ?></h3>
-                        <div class="esc-stat-value" id="esc-uptime-stat">—</div>
+            <div class="esc-history-grid">
+                <?php foreach ( $services as $service ) : ?>
+                    <div class="esc-history-card" data-service-id="<?php echo esc_attr( $service->id ); ?>">
+                        <div class="esc-history-card-header">
+                            <h3><?php echo esc_html( $service->name ); ?></h3>
+                            <span class="esc-service-url"><?php echo esc_html( $service->url ); ?></span>
+                        </div>
+                        
+                        <div class="esc-history-stats">
+                            <div class="esc-stat-mini">
+                                <span class="esc-stat-label"><?php _e( 'Uptime', 'easy-status-check' ); ?></span>
+                                <span class="esc-stat-value" data-stat="uptime-<?php echo esc_attr( $service->id ); ?>">—</span>
+                            </div>
+                            <div class="esc-stat-mini">
+                                <span class="esc-stat-label"><?php _e( 'Ø Zeit', 'easy-status-check' ); ?></span>
+                                <span class="esc-stat-value" data-stat="avgtime-<?php echo esc_attr( $service->id ); ?>">—</span>
+                            </div>
+                            <div class="esc-stat-mini">
+                                <span class="esc-stat-label"><?php _e( 'Checks', 'easy-status-check' ); ?></span>
+                                <span class="esc-stat-value" data-stat="checks-<?php echo esc_attr( $service->id ); ?>">—</span>
+                            </div>
+                        </div>
+                        
+                        <div class="esc-chart-mini">
+                            <canvas id="chart-<?php echo esc_attr( $service->id ); ?>" width="400" height="150"></canvas>
+                        </div>
                     </div>
-                    <div class="esc-stat-box">
-                        <h3><?php _e( 'Durchschn. Antwortzeit', 'easy-status-check' ); ?></h3>
-                        <div class="esc-stat-value" id="esc-avg-response-stat">—</div>
-                    </div>
-                    <div class="esc-stat-box">
-                        <h3><?php _e( 'Checks gesamt', 'easy-status-check' ); ?></h3>
-                        <div class="esc-stat-value" id="esc-total-checks-stat">—</div>
-                    </div>
-                    <div class="esc-stat-box">
-                        <h3><?php _e( 'Ausfälle', 'easy-status-check' ); ?></h3>
-                        <div class="esc-stat-value" id="esc-downtime-stat">—</div>
-                    </div>
-                </div>
-                
-                <div class="esc-chart-container">
-                    <h2><?php _e( 'Status-Verlauf', 'easy-status-check' ); ?></h2>
-                    <canvas id="esc-status-chart"></canvas>
-                </div>
-                
-                <div class="esc-chart-container">
-                    <h2><?php _e( 'Antwortzeiten', 'easy-status-check' ); ?></h2>
-                    <canvas id="esc-response-chart"></canvas>
-                </div>
+                <?php endforeach; ?>
                 
                 <div class="esc-history-table-container">
                     <h2><?php _e( 'Detaillierte Logs', 'easy-status-check' ); ?></h2>
@@ -117,96 +117,113 @@ class ESC_Status_History {
                         </tbody>
                     </table>
                 </div>
-            <?php else : ?>
-                <div class="notice notice-info">
-                    <p><?php _e( 'Bitte wählen Sie einen Service aus, um die History anzuzeigen.', 'easy-status-check' ); ?></p>
+            </div>
+            
+            <?php if ( empty( $services ) ) : ?>
+                <div class="notice notice-warning">
+                    <p><?php _e( 'Keine aktivierten Services gefunden. Bitte aktivieren Sie mindestens einen Service.', 'easy-status-check' ); ?></p>
                 </div>
             <?php endif; ?>
         </div>
         
         <style>
-            .esc-history-filters { margin: 20px 0; }
-            .esc-history-filters select,
-            .esc-history-filters button { margin-right: 10px; }
+            .esc-history-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                margin: 20px 0;
+            }
+            
+            .esc-history-card {
+                background: #fff;
+                border: 1px solid #ccd0d4;
+                border-radius: 8px;
+                padding: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            
+            .esc-history-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            
+            .esc-history-card-header h3 {
+                margin: 0 0 5px 0;
+                font-size: 16px;
+                color: #1d2327;
+            }
+            
+            .esc-service-url {
+                font-size: 12px;
+                color: #999;
+                word-break: break-all;
+            }
             
             .esc-history-stats {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 20px;
-                margin: 30px 0;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin: 15px 0;
+                padding: 15px 0;
+                border-top: 1px solid #f0f0f1;
+                border-bottom: 1px solid #f0f0f1;
             }
             
-            .esc-stat-box {
-                background: #fff;
-                border: 1px solid #ccd0d4;
-                border-radius: 4px;
-                padding: 20px;
+            .esc-stat-mini {
                 text-align: center;
             }
             
-            .esc-stat-box h3 {
-                margin: 0 0 10px 0;
-                font-size: 14px;
+            .esc-stat-label {
+                display: block;
+                font-size: 11px;
                 color: #666;
-                font-weight: normal;
+                margin-bottom: 5px;
+                text-transform: uppercase;
             }
             
             .esc-stat-value {
-                font-size: 32px;
+                display: block;
+                font-size: 18px;
                 font-weight: bold;
                 color: #2271b1;
             }
             
-            .esc-chart-container {
-                background: #fff;
-                border: 1px solid #ccd0d4;
-                border-radius: 4px;
-                padding: 20px;
-                margin: 20px 0;
+            .esc-chart-mini {
+                margin-top: 15px;
             }
             
-            .esc-chart-container h2 {
-                margin: 0 0 20px 0;
-                font-size: 18px;
+            .esc-chart-mini canvas {
+                width: 100% !important;
+                height: auto !important;
             }
             
-            .esc-chart-container canvas {
-                max-height: 400px;
+            @media (max-width: 1200px) {
+                .esc-history-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
             }
             
-            .esc-history-table-container {
-                background: #fff;
-                border: 1px solid #ccd0d4;
-                border-radius: 4px;
-                padding: 20px;
-                margin: 20px 0;
+            @media (max-width: 768px) {
+                .esc-history-grid {
+                    grid-template-columns: 1fr;
+                }
             }
-            
-            .esc-history-table-container h2 {
-                margin: 0 0 20px 0;
-                font-size: 18px;
-            }
-            
-            .esc-status-online { color: #46b450; font-weight: bold; }
-            .esc-status-offline { color: #dc3232; font-weight: bold; }
-            .esc-status-warning { color: #ffb900; font-weight: bold; }
         </style>
         
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <script>
         jQuery(document).ready(function($) {
-            var statusChart = null;
-            var responseChart = null;
+            var period = '<?php echo esc_js( $period ); ?>';
+            var charts = {};
             
-            function loadHistoryData() {
-                var serviceId = $('#esc-service-select').val();
-                var period = $('#esc-period-select').val();
-                
-                if (!serviceId) {
-                    alert('<?php _e( 'Bitte wählen Sie einen Service aus', 'easy-status-check' ); ?>');
-                    return;
-                }
-                
+            // Load data for all services
+            $('.esc-history-card').each(function() {
+                var serviceId = $(this).data('service-id');
+                loadServiceData(serviceId);
+            });
+            
+            function loadServiceData(serviceId) {
                 $.post(ajaxurl, {
                     action: 'esc_get_history_data',
                     service_id: serviceId,
@@ -214,98 +231,77 @@ class ESC_Status_History {
                     nonce: '<?php echo wp_create_nonce( 'esc_get_history_data' ); ?>'
                 }, function(response) {
                     if (response.success) {
-                        updateStats(response.data.stats);
-                        updateCharts(response.data.chart_data);
-                        updateTable(response.data.logs);
+                        updateServiceStats(serviceId, response.data.stats);
+                        createServiceChart(serviceId, response.data.chart_data);
                     }
                 });
             }
             
-            function updateStats(stats) {
-                $('#esc-uptime-stat').text(stats.uptime + '%');
-                $('#esc-avg-response-stat').text(stats.avg_response + ' ms');
-                $('#esc-total-checks-stat').text(stats.total_checks);
-                $('#esc-downtime-stat').text(stats.downtime_count);
+            function updateServiceStats(serviceId, stats) {
+                $('[data-stat="uptime-' + serviceId + '"]').text(stats.uptime + '%');
+                $('[data-stat="avgtime-' + serviceId + '"]').text(stats.avg_response + 'ms');
+                $('[data-stat="checks-' + serviceId + '"]').text(stats.total_checks);
             }
             
-            function updateCharts(chartData) {
-                var ctx1 = document.getElementById('esc-status-chart');
-                var ctx2 = document.getElementById('esc-response-chart');
+            function createServiceChart(serviceId, chartData) {
+                var ctx = document.getElementById('chart-' + serviceId);
+                if (!ctx) return;
                 
-                if (statusChart) statusChart.destroy();
-                if (responseChart) responseChart.destroy();
+                if (charts[serviceId]) {
+                    charts[serviceId].destroy();
+                }
                 
-                statusChart = new Chart(ctx1, {
+                charts[serviceId] = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: chartData.labels,
                         datasets: [{
-                            label: '<?php _e( 'Status', 'easy-status-check' ); ?>',
-                            data: chartData.status_data,
+                            label: 'Status',
+                            data: chartData.response_data,
                             borderColor: '#2271b1',
                             backgroundColor: 'rgba(34, 113, 177, 0.1)',
-                            stepped: true,
-                            fill: true
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 2,
+                            pointHoverRadius: 4
                         }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
                         scales: {
+                            x: {
+                                display: false
+                            },
                             y: {
                                 beginAtZero: true,
-                                max: 1,
                                 ticks: {
-                                    callback: function(value) {
-                                        return value === 1 ? 'Online' : 'Offline';
+                                    font: {
+                                        size: 10
                                     }
                                 }
                             }
                         }
                     }
                 });
-                
-                responseChart = new Chart(ctx2, {
-                    type: 'line',
-                    data: {
-                        labels: chartData.labels,
-                        datasets: [{
-                            label: '<?php _e( 'Antwortzeit (ms)', 'easy-status-check' ); ?>',
-                            data: chartData.response_data,
-                            borderColor: '#46b450',
-                            backgroundColor: 'rgba(70, 180, 80, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
             }
             
+            // Alte Funktionen entfernt - nicht mehr benötigt
             function updateTable(logs) {
-                var tbody = $('#esc-history-tbody');
-                tbody.empty();
-                
-                if (logs.length === 0) {
-                    tbody.append('<tr><td colspan="5"><?php _e( 'Keine Daten verfügbar', 'easy-status-check' ); ?></td></tr>');
-                    return;
-                }
-                
-                $.each(logs, function(i, log) {
-                    var statusClass = 'esc-status-' + log.status;
-                    var statusText = log.status === 'online' ? 'Online' : (log.status === 'offline' ? 'Offline' : 'Warnung');
-                    
-                    var row = '<tr>' +
-                        '<td>' + log.checked_at + '</td>' +
-                        '<td class="' + statusClass + '">' + statusText + '</td>' +
+                // Nicht mehr verwendet
+            }
+            
+            function updateCharts(chartData) {
+                // Nicht mehr verwendet
+            }
+            
+            function loadHistoryData() {
+                // Nicht mehr verwendet
                         '<td>' + (log.http_code || '—') + '</td>' +
                         '<td>' + (log.response_time ? log.response_time + ' ms' : '—') + '</td>' +
                         '<td>' + (log.error_message || '—') + '</td>' +
@@ -315,13 +311,8 @@ class ESC_Status_History {
                 });
             }
             
-            $('#esc-load-history').on('click', function() {
-                loadHistoryData();
-            });
-            
-            $('#esc-export-history').on('click', function() {
-                var serviceId = $('#esc-service-select').val();
-                var period = $('#esc-period-select').val();
+            // Event-Handler entfernt - keine Buttons mehr vorhanden
+            // Alle Services werden automatisch beim Laden geladen
                 
                 if (!serviceId) {
                     alert('<?php _e( 'Bitte wählen Sie einen Service aus', 'easy-status-check' ); ?>');

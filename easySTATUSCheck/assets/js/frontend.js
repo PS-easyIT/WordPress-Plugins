@@ -62,10 +62,23 @@
             const showUptime = $container.data('show-uptime') || 'true';
             const showResponseTime = $container.data('show-response-time') || 'true';
             
+            console.log('ESC Frontend: Loading status data', {
+                category: category,
+                force: force,
+                ajaxUrl: escFrontend.ajaxUrl
+            });
+            
             // Show loading state
             if (force) {
                 this.showLoading($container);
                 this.setRefreshButtonLoading($container, true);
+            }
+            
+            // Check if escFrontend is defined
+            if (typeof escFrontend === 'undefined') {
+                console.error('ESC Frontend: escFrontend object not defined!');
+                this.showError($container, 'Konfigurationsfehler: escFrontend nicht definiert');
+                return;
             }
             
             $.ajax({
@@ -79,15 +92,18 @@
                     nonce: escFrontend.nonce
                 },
                 success: (response) => {
+                    console.log('ESC Frontend: AJAX success', response);
                     if (response.success) {
                         this.renderStatusData($container, response.data);
                         this.updateTimestamp($container, response.data.timestamp);
                     } else {
-                        this.showError($container, response.data.message);
+                        console.error('ESC Frontend: Response error', response);
+                        this.showError($container, response.data?.message || 'Unbekannter Fehler');
                     }
                 },
-                error: () => {
-                    this.showError($container, escFrontend.strings.error);
+                error: (xhr, status, error) => {
+                    console.error('ESC Frontend: AJAX error', {xhr, status, error});
+                    this.showError($container, escFrontend.strings.error + ': ' + error);
                 },
                 complete: () => {
                     this.setRefreshButtonLoading($container, false);
@@ -312,8 +328,14 @@
 
     // Initialize when document is ready
     $(document).ready(function() {
-        ESCFrontend.init();
-        ESCFrontend.handleConnectionStatus();
+        console.log('ESC Frontend: Initializing...');
+        try {
+            ESCFrontend.init();
+            ESCFrontend.handleConnectionStatus();
+            console.log('ESC Frontend: Initialized successfully');
+        } catch (error) {
+            console.error('ESC Frontend: Initialization error', error);
+        }
     });
 
     // Handle dynamic content (for AJAX-loaded content)

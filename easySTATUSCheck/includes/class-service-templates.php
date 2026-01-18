@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ESC_Service_Templates {
 
     public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_templates_page' ), 20 );
+        add_action( 'admin_menu', array( $this, 'add_templates_page' ), 20 ); // Position 4
         add_action( 'wp_ajax_esc_add_template', array( $this, 'ajax_add_template' ) );
         add_action( 'wp_ajax_esc_save_custom_template', array( $this, 'ajax_save_custom_template' ) );
         add_action( 'wp_ajax_esc_delete_custom_template', array( $this, 'ajax_delete_custom_template' ) );
@@ -89,7 +89,8 @@ class ESC_Service_Templates {
                     'json_path' => 'status.indicator',
                 ),
             ),
-            'Deutsche Hosting-Anbieter' => array(
+            // Deutsche Hosting-Anbieter sind jetzt in "Hosting Anbieter" integriert
+            /*'Deutsche Hosting-Anbieter' => array(
                 array(
                     'name' => 'IONOS Status',
                     'url' => 'https://status.ionos.de',
@@ -134,7 +135,7 @@ class ESC_Service_Templates {
                     'response_type' => 'json',
                     'json_path' => 'status.indicator',
                 ),
-            ),
+            ),*/
             'CDN & Performance' => array(
                 array(
                     'name' => 'Cloudflare CDN',
@@ -358,10 +359,6 @@ class ESC_Service_Templates {
                             <span class="dashicons dashicons-plus-alt"></span>
                             <?php _e( 'Eigenes Template erstellen', 'easy-status-check' ); ?>
                         </button>
-                        <button class="button button-secondary" id="esc-bulk-add-templates">
-                            <span class="dashicons dashicons-download"></span>
-                            <?php _e( 'Mehrere hinzufügen', 'easy-status-check' ); ?>
-                        </button>
                     </div>
                 </div>
                 
@@ -404,8 +401,10 @@ class ESC_Service_Templates {
                                         </div>
                                         <div class="esc-template-footer">
                                             <button class="button button-primary esc-add-template" 
-                                                    data-template='<?php echo esc_attr( json_encode( $template ) ); ?>'
-                                                    data-template-name="<?php echo esc_attr( $template['name'] ); ?>">
+                                                    data-template-json="<?php echo esc_attr( json_encode( $template ) ); ?>"
+                                                    data-name="<?php echo esc_attr( $template['name'] ); ?>"
+                                                    data-url="<?php echo esc_attr( $template['url'] ); ?>"
+                                                    data-category="<?php echo esc_attr( $template['category'] ?? 'custom' ); ?>">
                                                 <span class="dashicons dashicons-plus"></span>
                                                 <?php _e( 'Hinzufügen', 'easy-status-check' ); ?>
                                             </button>
@@ -436,7 +435,9 @@ class ESC_Service_Templates {
                                         </div>
                                         <div class="esc-template-footer">
                                             <button class="button button-primary esc-add-template" 
-                                                    data-template='<?php echo esc_attr( json_encode( $template ) ); ?>'>
+                                                    data-template-json="<?php echo esc_attr( json_encode( $template ) ); ?>"
+                                                    data-name="<?php echo esc_attr( $template['name'] ); ?>"
+                                                    data-url="<?php echo esc_attr( $template['url'] ); ?>">
                                                 <?php _e( 'Hinzufügen', 'easy-status-check' ); ?>
                                             </button>
                                             <button class="button esc-delete-custom-template" 
@@ -767,6 +768,108 @@ class ESC_Service_Templates {
                     gap: 10px;
                 }
             }
+            
+            /* Modal Styles */
+            .esc-modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.7);
+                z-index: 100000;
+                overflow-y: auto;
+                padding: 20px;
+            }
+            
+            .esc-modal-overlay.show {
+                display: flex !important;
+                align-items: flex-start;
+                justify-content: center;
+                padding-top: 50px;
+            }
+            
+            .esc-modal {
+                background: #fff;
+                border-radius: 8px;
+                max-width: 700px;
+                width: 100%;
+                margin: 0 auto;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                position: relative;
+            }
+            
+            .esc-modal-header {
+                padding: 20px 25px;
+                border-bottom: 1px solid #ddd;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #f9f9f9;
+                border-radius: 8px 8px 0 0;
+            }
+            
+            .esc-modal-header h2 {
+                margin: 0;
+                font-size: 20px;
+                color: #1d2327;
+            }
+            
+            .esc-modal-close {
+                background: none;
+                border: none;
+                font-size: 28px;
+                cursor: pointer;
+                padding: 0;
+                width: 32px;
+                height: 32px;
+                line-height: 1;
+                color: #666;
+                transition: color 0.2s;
+            }
+            
+            .esc-modal-close:hover {
+                color: #d63638;
+            }
+            
+            .esc-modal-body {
+                padding: 25px;
+                max-height: calc(90vh - 160px);
+                overflow-y: auto;
+            }
+            
+            .esc-modal-body .form-table {
+                margin: 0;
+            }
+            
+            .esc-modal-body .form-table th {
+                padding: 15px 10px 15px 0;
+                width: 200px;
+            }
+            
+            .esc-modal-body .form-table td {
+                padding: 15px 10px;
+            }
+            
+            .esc-modal-body .regular-text {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .esc-modal-footer {
+                padding: 20px 25px;
+                border-top: 1px solid #ddd;
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+                background: #f9f9f9;
+                border-radius: 0 0 8px 8px;
+            }
+            
+            .esc-modal-footer .button {
+                min-width: 100px;
+            }
         </style>
         
         <script>
@@ -774,17 +877,25 @@ class ESC_Service_Templates {
             // Template hinzufügen
             $('.esc-add-template').on('click', function() {
                 var button = $(this);
-                var template = button.data('template');
-                var templateName = button.data('template-name');
+                var templateJson = button.attr('data-template-json');
+                var templateName = button.attr('data-name');
                 var originalHtml = button.html();
+                
+                console.log('ESC: Template JSON string:', templateJson);
+                
+                if (!templateJson) {
+                    alert('<?php _e( 'Fehler: Template-Daten fehlen', 'easy-status-check' ); ?>');
+                    return;
+                }
                 
                 button.prop('disabled', true).html('<span class="dashicons dashicons-update spin"></span> <?php _e( 'Wird hinzugefügt...', 'easy-status-check' ); ?>');
                 
                 $.post(ajaxurl, {
                     action: 'esc_add_template',
-                    template: JSON.stringify(template),
+                    template: templateJson,
                     nonce: '<?php echo wp_create_nonce( 'esc_add_template' ); ?>'
                 }, function(response) {
+                    console.log('ESC: Response:', response);
                     if (response.success) {
                         button.html('<span class="dashicons dashicons-yes"></span> <?php _e( 'Hinzugefügt', 'easy-status-check' ); ?>').addClass('button-success');
                         
@@ -870,14 +981,76 @@ class ESC_Service_Templates {
                 }, 3000);
             }
             
-            // Bulk Add (Placeholder)
-            $('#esc-bulk-add-templates').on('click', function() {
-                alert('<?php _e( 'Bulk-Hinzufügen-Funktion kommt bald!', 'easy-status-check' ); ?>');
-            });
-            
-            // Custom Template erstellen (Placeholder)
+            // Custom Template erstellen
             $('#esc-create-custom-template').on('click', function() {
-                alert('<?php _e( 'Custom-Template-Funktion kommt bald!', 'easy-status-check' ); ?>');
+                var modal = $('<div class="esc-modal-overlay"><div class="esc-modal"><div class="esc-modal-header"><h2><?php _e( 'Eigenes Template erstellen', 'easy-status-check' ); ?></h2><button class="esc-modal-close">&times;</button></div><div class="esc-modal-body"><form id="esc-custom-template-form"><table class="form-table"><tr><th><label for="custom-name"><?php _e( 'Name', 'easy-status-check' ); ?> *</label></th><td><input type="text" id="custom-name" class="regular-text" required></td></tr><tr><th><label for="custom-url"><?php _e( 'URL', 'easy-status-check' ); ?> *</label></th><td><input type="url" id="custom-url" class="regular-text" required placeholder="https://"></td></tr><tr><th><label for="custom-method"><?php _e( 'Methode', 'easy-status-check' ); ?></label></th><td><select id="custom-method"><option value="GET">GET</option><option value="POST">POST</option><option value="HEAD">HEAD</option></select></td></tr><tr><th><label for="custom-expected-code"><?php _e( 'Erwarteter HTTP-Code', 'easy-status-check' ); ?></label></th><td><input type="text" id="custom-expected-code" value="200" class="small-text"></td></tr><tr><th><label for="custom-timeout"><?php _e( 'Timeout (Sekunden)', 'easy-status-check' ); ?></label></th><td><input type="number" id="custom-timeout" value="10" min="5" max="60" class="small-text"></td></tr><tr><th><label for="custom-response-type"><?php _e( 'Response-Typ', 'easy-status-check' ); ?></label></th><td><select id="custom-response-type"><option value="">Standard (HTML)</option><option value="json">JSON</option><option value="xml">XML</option></select></td></tr><tr id="custom-json-path-row" style="display:none;"><th><label for="custom-json-path"><?php _e( 'JSON-Pfad', 'easy-status-check' ); ?></label></th><td><input type="text" id="custom-json-path" class="regular-text" placeholder="status.indicator"></td></tr></table></form></div><div class="esc-modal-footer"><button type="button" class="button button-primary" id="esc-save-custom-template"><?php _e( 'Template speichern', 'easy-status-check' ); ?></button><button type="button" class="button esc-modal-close"><?php _e( 'Abbrechen', 'easy-status-check' ); ?></button></div></div></div>');
+                
+                $('body').append(modal);
+                setTimeout(function() {
+                    modal.addClass('show');
+                }, 10);
+                
+                // Show/hide JSON path field
+                modal.find('#custom-response-type').on('change', function() {
+                    if ($(this).val() === 'json') {
+                        modal.find('#custom-json-path-row').show();
+                    } else {
+                        modal.find('#custom-json-path-row').hide();
+                    }
+                });
+                
+                // Close modal
+                modal.find('.esc-modal-close').on('click', function() {
+                    modal.removeClass('show');
+                    setTimeout(function() {
+                        modal.remove();
+                    }, 200);
+                });
+                
+                // Save custom template
+                modal.find('#esc-save-custom-template').on('click', function() {
+                    var templateData = {
+                        name: modal.find('#custom-name').val(),
+                        url: modal.find('#custom-url').val(),
+                        category: 'custom',
+                        method: modal.find('#custom-method').val(),
+                        expected_code: modal.find('#custom-expected-code').val(),
+                        timeout: parseInt(modal.find('#custom-timeout').val())
+                    };
+                    
+                    var responseType = modal.find('#custom-response-type').val();
+                    if (responseType) {
+                        templateData.response_type = responseType;
+                        if (responseType === 'json') {
+                            var jsonPath = modal.find('#custom-json-path').val();
+                            if (jsonPath) {
+                                templateData.json_path = jsonPath;
+                            }
+                        }
+                    }
+                    
+                    if (!templateData.name || !templateData.url) {
+                        alert('<?php _e( 'Bitte füllen Sie alle Pflichtfelder aus.', 'easy-status-check' ); ?>');
+                        return;
+                    }
+                    
+                    $.post(ajaxurl, {
+                        action: 'esc_save_custom_template',
+                        template: templateData,
+                        nonce: '<?php echo wp_create_nonce( 'esc_save_custom_template' ); ?>'
+                    }, function(response) {
+                        if (response.success) {
+                            showNotification('success', response.data.message);
+                            modal.removeClass('show');
+                            setTimeout(function() {
+                                modal.remove();
+                                location.reload();
+                            }, 300);
+                        } else {
+                            alert(response.data.message);
+                        }
+                    });
+                });
             });
         });
         </script>
@@ -901,16 +1074,38 @@ class ESC_Service_Templates {
             wp_send_json_error( array( 'message' => __( 'Keine Berechtigung', 'easy-status-check' ) ) );
         }
         
-        $template_json = isset( $_POST['template'] ) ? stripslashes( $_POST['template'] ) : '';
-        $template = json_decode( $template_json, true );
+        // Handle template data - can be JSON string or already decoded array
+        $template = null;
+        
+        if ( isset( $_POST['template'] ) ) {
+            if ( is_array( $_POST['template'] ) ) {
+                $template = $_POST['template'];
+            } else {
+                $template_json = stripslashes( $_POST['template'] );
+                $template = json_decode( $template_json, true );
+            }
+        }
+        
+        // Debug logging
+        error_log( 'ESC AJAX: Received template data: ' . print_r( $_POST['template'], true ) );
+        error_log( 'ESC AJAX: Decoded template: ' . print_r( $template, true ) );
         
         if ( ! $template || ! is_array( $template ) ) {
-            wp_send_json_error( array( 'message' => __( 'Ungültige Template-Daten', 'easy-status-check' ) ) );
+            wp_send_json_error( array( 
+                'message' => __( 'Ungültige Template-Daten', 'easy-status-check' ),
+                'debug' => array(
+                    'received' => $_POST['template'],
+                    'decoded' => $template
+                )
+            ) );
         }
         
         // Validate required fields
         if ( empty( $template['name'] ) || empty( $template['url'] ) ) {
-            wp_send_json_error( array( 'message' => __( 'Name und URL sind erforderlich', 'easy-status-check' ) ) );
+            wp_send_json_error( array( 
+                'message' => __( 'Name und URL sind erforderlich', 'easy-status-check' ),
+                'debug' => $template
+            ) );
         }
         
         $predefined = new ESC_Predefined_Services();
@@ -949,20 +1144,35 @@ class ESC_Service_Templates {
         }
         
         $custom_templates = $this->get_custom_templates();
+        
+        $template_data = isset( $_POST['template'] ) ? $_POST['template'] : $_POST;
+        
         $new_template = array(
             'id' => uniqid(),
-            'name' => sanitize_text_field( $_POST['name'] ),
-            'url' => esc_url_raw( $_POST['url'] ),
-            'category' => sanitize_text_field( $_POST['category'] ),
-            'method' => sanitize_text_field( $_POST['method'] ),
-            'expected_code' => sanitize_text_field( $_POST['expected_code'] ),
-            'timeout' => intval( $_POST['timeout'] ),
+            'name' => sanitize_text_field( $template_data['name'] ),
+            'url' => esc_url_raw( $template_data['url'] ),
+            'category' => sanitize_text_field( $template_data['category'] ?? 'custom' ),
+            'method' => sanitize_text_field( $template_data['method'] ?? 'GET' ),
+            'expected_code' => sanitize_text_field( $template_data['expected_code'] ?? '200' ),
+            'timeout' => intval( $template_data['timeout'] ?? 10 ),
         );
+        
+        // Optional fields
+        if ( ! empty( $template_data['response_type'] ) ) {
+            $new_template['response_type'] = sanitize_text_field( $template_data['response_type'] );
+        }
+        
+        if ( ! empty( $template_data['json_path'] ) ) {
+            $new_template['json_path'] = sanitize_text_field( $template_data['json_path'] );
+        }
         
         $custom_templates[] = $new_template;
         update_option( 'esc_custom_templates', $custom_templates );
         
-        wp_send_json_success( array( 'message' => __( 'Template gespeichert', 'easy-status-check' ) ) );
+        wp_send_json_success( array( 
+            'message' => __( 'Eigenes Template erfolgreich erstellt!', 'easy-status-check' ),
+            'template' => $new_template
+        ) );
     }
 
     /**

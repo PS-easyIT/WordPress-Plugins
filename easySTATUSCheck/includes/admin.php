@@ -14,6 +14,7 @@ class ESC_Admin {
 
     public function __construct() {
         add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+        add_action( 'admin_menu', array( $this, 'add_settings_menu' ), 100 ); // Einstellungen ganz am Ende
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
         add_action( 'admin_init', array( $this, 'register_settings' ) );
     }
@@ -22,9 +23,9 @@ class ESC_Admin {
      * Add admin menu pages
      */
     public function add_admin_menu() {
-        // Main menu page
+        // Main menu page - Dashboard
         add_menu_page(
-            __( 'Status Check', 'easy-status-check' ),
+            __( 'Status Check Dashboard', 'easy-status-check' ),
             __( 'Status Check', 'easy-status-check' ),
             'manage_options',
             'easy-status-check',
@@ -33,7 +34,17 @@ class ESC_Admin {
             30
         );
 
-        // Services submenu
+        // Dashboard submenu (ersetzt den Hauptmenüpunkt)
+        add_submenu_page(
+            'easy-status-check',
+            __( 'Dashboard', 'easy-status-check' ),
+            __( 'Dashboard', 'easy-status-check' ),
+            'manage_options',
+            'easy-status-check',
+            array( $this, 'render_dashboard' )
+        );
+
+        // Services submenu - Position 2
         add_submenu_page(
             'easy-status-check',
             __( 'Services verwalten', 'easy-status-check' ),
@@ -42,8 +53,20 @@ class ESC_Admin {
             'easy-status-check-services',
             array( $this, 'render_services' )
         );
+        
+        // Note: History (Position 3), Templates (Position 4) und Incidents (Position 5) 
+        // werden von ihren jeweiligen Klassen registriert
+        // ESC_Status_History adds 'easy-status-check-history' with priority 20
+        // ESC_Service_Templates adds 'easy-status-check-templates' with priority 30
+        // ESC_Incident_Tracker adds 'easy-status-check-incidents' with priority 40
 
-        // Settings submenu
+        // Note: Einstellungen wird mit Priorität 100 am Ende registriert (siehe unten)
+    }
+    
+    /**
+     * Register settings menu at the end
+     */
+    public function add_settings_menu() {
         add_submenu_page(
             'easy-status-check',
             __( 'Einstellungen', 'easy-status-check' ),
@@ -52,21 +75,6 @@ class ESC_Admin {
             'easy-status-check-settings',
             array( $this, 'render_settings' )
         );
-
-        // Status page submenu
-        add_submenu_page(
-            'easy-status-check',
-            __( 'Status Übersicht', 'easy-status-check' ),
-            __( 'Status Übersicht', 'easy-status-check' ),
-            'manage_options',
-            'easy-status-check-status',
-            array( $this, 'render_status_overview' )
-        );
-        
-        // Note: Incidents, History and Templates pages are registered by their respective classes
-        // ESC_Incident_Tracker adds 'easy-status-check-incidents'
-        // ESC_Status_History adds 'easy-status-check-history'
-        // ESC_Service_Templates adds 'easy-status-check-templates'
     }
 
     /**
@@ -77,26 +85,37 @@ class ESC_Admin {
             return;
         }
 
-        // Enqueue unified design system
-        wp_enqueue_style(
-            'easy-design-system',
-            EASY_STATUS_CHECK_URL . '../easy-design-system/easy-design-system.css',
-            array(),
-            EASY_STATUS_CHECK_VERSION
-        );
+        $dependencies = array( 'jquery' );
+        $style_dependencies = array();
+        
+        // Check if easy-design-system exists
+        $design_system_path = EASY_STATUS_CHECK_DIR . '../easy-design-system/easy-design-system.css';
+        
+        if ( file_exists( $design_system_path ) ) {
+            // Enqueue unified design system
+            wp_enqueue_style(
+                'easy-design-system',
+                EASY_STATUS_CHECK_URL . '../easy-design-system/easy-design-system.css',
+                array(),
+                EASY_STATUS_CHECK_VERSION
+            );
 
-        wp_enqueue_script(
-            'easy-design-system',
-            EASY_STATUS_CHECK_URL . '../easy-design-system/easy-design-system.js',
-            array( 'jquery' ),
-            EASY_STATUS_CHECK_VERSION,
-            true
-        );
+            wp_enqueue_script(
+                'easy-design-system',
+                EASY_STATUS_CHECK_URL . '../easy-design-system/easy-design-system.js',
+                array( 'jquery' ),
+                EASY_STATUS_CHECK_VERSION,
+                true
+            );
+            
+            $dependencies[] = 'easy-design-system';
+            $style_dependencies[] = 'easy-design-system';
+        }
 
         wp_enqueue_script(
             'esc-admin-js',
             EASY_STATUS_CHECK_URL . 'assets/js/admin.js',
-            array( 'jquery', 'easy-design-system' ),
+            $dependencies,
             EASY_STATUS_CHECK_VERSION,
             true
         );
@@ -104,7 +123,7 @@ class ESC_Admin {
         wp_enqueue_style(
             'esc-admin-css',
             EASY_STATUS_CHECK_URL . 'assets/css/admin.css',
-            array( 'easy-design-system' ),
+            $style_dependencies,
             EASY_STATUS_CHECK_VERSION
         );
 
@@ -127,6 +146,7 @@ class ESC_Admin {
     public function register_settings() {
         register_setting( 'esc_settings', 'esc_general_settings' );
         register_setting( 'esc_settings', 'esc_notification_settings' );
+        register_setting( 'esc_public_settings', 'esc_public_settings' );
     }
 
     /**
@@ -208,15 +228,14 @@ class ESC_Admin {
                     <div class="esc-widget">
                         <h3><?php esc_html_e( 'Schnellaktionen', 'easy-status-check' ); ?></h3>
                         <div class="esc-quick-actions">
-                            <a href="<?php echo admin_url( 'admin.php?page=easy-status-check-services' ); ?>" class="button button-primary">
+                            <a href="<?php echo admin_url( 'admin.php?page=easy-status-check-services' ); ?>" class="button">
                                 <?php esc_html_e( 'Services verwalten', 'easy-status-check' ); ?>
                             </a>
-                            <a href="<?php echo admin_url( 'admin.php?page=easy-status-check-status' ); ?>" class="button">
-                                <?php esc_html_e( 'Status Übersicht', 'easy-status-check' ); ?>
-                            </a>
-                            <button type="button" id="esc-force-check" class="button">
-                                <?php esc_html_e( 'Sofortige Prüfung', 'easy-status-check' ); ?>
+                            <button type="button" id="esc-force-check" class="button button-primary">
+                                <span class="dashicons dashicons-update"></span>
+                                <?php esc_html_e( 'Alle Services jetzt prüfen', 'easy-status-check' ); ?>
                             </button>
+                            <span id="esc-check-status" style="margin-left: 10px; display: none;"></span>
                         </div>
                     </div>
 
@@ -261,13 +280,16 @@ class ESC_Admin {
         <div class="wrap">
             <h1><?php esc_html_e( 'Services verwalten', 'easy-status-check' ); ?></h1>
             
-            <div class="esc-services-actions">
-                <button type="button" id="esc-add-service" class="button button-primary">
-                    <?php esc_html_e( 'Neuen Service hinzufügen', 'easy-status-check' ); ?>
-                </button>
-                <button type="button" id="esc-add-predefined" class="button">
-                    <?php esc_html_e( 'Vordefinierte Services hinzufügen', 'easy-status-check' ); ?>
-                </button>
+            <div class="notice notice-info">
+                <p>
+                    <strong><?php esc_html_e( 'Neue Services hinzufügen:', 'easy-status-check' ); ?></strong>
+                    <?php 
+                    printf( 
+                        __( 'Um neue Services hinzuzufügen, nutzen Sie bitte die %s.', 'easy-status-check' ),
+                        '<a href="' . admin_url( 'admin.php?page=easy-status-check-templates' ) . '">' . __( 'Templates-Seite', 'easy-status-check' ) . '</a>'
+                    ); 
+                    ?>
+                </p>
             </div>
 
             <form method="post" id="esc-services-form">
@@ -517,9 +539,16 @@ class ESC_Admin {
     }
 
     /**
-     * Render settings page
+     * Render settings page with tabs
      */
     public function render_settings() {
+        require_once EASY_STATUS_CHECK_DIR . 'includes/admin-settings-tabs.php';
+    }
+    
+    /**
+     * OLD render_settings - DEPRECATED
+     */
+    public function render_settings_old() {
         $general_settings = get_option( 'esc_general_settings', array() );
         $notification_settings = get_option( 'esc_notification_settings', array() );
         
@@ -569,6 +598,182 @@ class ESC_Admin {
                 <?php submit_button(); ?>
             </form>
             
+            <!-- Public Pages Sektion -->
+            <hr style="margin: 40px 0;">
+            
+            <h2><?php esc_html_e( 'Öffentliche Seiten', 'easy-status-check' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Konfigurieren Sie das Aussehen und Verhalten der öffentlichen Status-Seiten.', 'easy-status-check' ); ?>
+            </p>
+            
+            <form method="post" action="">
+                <?php 
+                // Handle settings save
+                if ( isset( $_POST['esc_save_public_settings'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'esc_public_settings' ) ) {
+                    update_option( 'esc_public_status_enabled', isset( $_POST['esc_public_status_enabled'] ) ? 1 : 0 );
+                    update_option( 'esc_public_status_slug', sanitize_title( $_POST['esc_public_status_slug'] ) );
+                    
+                    // Public Settings
+                    $public_settings = array(
+                        'primary_color' => sanitize_hex_color( $_POST['esc_public_settings']['primary_color'] ?? '#2271b1' ),
+                        'success_color' => sanitize_hex_color( $_POST['esc_public_settings']['success_color'] ?? '#00a32a' ),
+                        'warning_color' => sanitize_hex_color( $_POST['esc_public_settings']['warning_color'] ?? '#f0b849' ),
+                        'error_color' => sanitize_hex_color( $_POST['esc_public_settings']['error_color'] ?? '#d63638' ),
+                        'background_color' => sanitize_hex_color( $_POST['esc_public_settings']['background_color'] ?? '#f0f0f1' ),
+                        'text_color' => sanitize_hex_color( $_POST['esc_public_settings']['text_color'] ?? '#1d2327' ),
+                        'show_response_time' => isset( $_POST['esc_public_settings']['show_response_time'] ),
+                        'show_uptime' => isset( $_POST['esc_public_settings']['show_uptime'] ),
+                        'refresh_interval' => intval( $_POST['esc_public_settings']['refresh_interval'] ?? 300 )
+                    );
+                    update_option( 'esc_public_settings', $public_settings );
+                    
+                    flush_rewrite_rules();
+                    
+                    echo '<div class="notice notice-success"><p>' . __( 'Einstellungen gespeichert.', 'easy-status-check' ) . '</p></div>';
+                }
+                
+                wp_nonce_field( 'esc_public_settings' );
+                ?>
+                <input type="hidden" name="esc_save_public_settings" value="1">
+                
+                <?php
+                $public_settings = get_option( 'esc_public_settings', array(
+                    'primary_color' => '#2271b1',
+                    'success_color' => '#00a32a',
+                    'warning_color' => '#f0b849',
+                    'error_color' => '#d63638',
+                    'background_color' => '#f0f0f1',
+                    'text_color' => '#1d2327',
+                    'show_response_time' => true,
+                    'show_uptime' => true,
+                    'refresh_interval' => 300
+                ) );
+                
+                $public_status_enabled = get_option( 'esc_public_status_enabled', false );
+                $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
+                ?>
+                
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Public Pages aktivieren', 'easy-status-check' ); ?></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="esc_public_status_enabled" value="1" <?php checked( $public_status_enabled ); ?>>
+                                <?php esc_html_e( 'Öffentliche Seiten aktivieren (Services, Incidents, History)', 'easy-status-check' ); ?>
+                            </label>
+                            <p class="description"><?php esc_html_e( 'Aktiviert alle öffentlichen Status-Seiten', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Basis URL-Slug', 'easy-status-check' ); ?></th>
+                        <td>
+                            <input type="text" name="esc_public_status_slug" value="<?php echo esc_attr( $public_status_slug ); ?>" class="regular-text">
+                            <p class="description">
+                                <?php printf( __( 'Basis-URL: %s (Unterseiten: /services, /incidents, /history/ID)', 'easy-status-check' ), '<code>' . home_url( '/' ) . esc_html( $public_status_slug ) . '</code>' ); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Links zu Public Pages', 'easy-status-check' ); ?></th>
+                        <td>
+                            <?php if ( $public_status_enabled ) : ?>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <a href="<?php echo home_url( '/' . $public_status_slug . '/services' ); ?>" class="button button-secondary" target="_blank">
+                                        <span class="dashicons dashicons-external" style="margin-top: 3px;"></span>
+                                        <?php esc_html_e( 'Services', 'easy-status-check' ); ?>
+                                    </a>
+                                    <a href="<?php echo home_url( '/' . $public_status_slug . '/incidents' ); ?>" class="button button-secondary" target="_blank">
+                                        <span class="dashicons dashicons-external" style="margin-top: 3px;"></span>
+                                        <?php esc_html_e( 'Incidents', 'easy-status-check' ); ?>
+                                    </a>
+                                </div>
+                            <?php else : ?>
+                                <span class="description"><?php esc_html_e( 'Public Pages sind deaktiviert. Aktivieren Sie sie oben.', 'easy-status-check' ); ?></span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Primärfarbe', 'easy-status-check' ); ?></th>
+                        <td>
+                            <input type="color" name="esc_public_settings[primary_color]" value="<?php echo esc_attr( $public_settings['primary_color'] ); ?>">
+                            <p class="description"><?php esc_html_e( 'Hauptfarbe für Buttons und Akzente', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Erfolgsfarbe (Online)', 'easy-status-check' ); ?></th>
+                        <td>
+                            <input type="color" name="esc_public_settings[success_color]" value="<?php echo esc_attr( $public_settings['success_color'] ); ?>">
+                            <p class="description"><?php esc_html_e( 'Farbe für Online-Status', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Warnfarbe', 'easy-status-check' ); ?></th>
+                        <td>
+                            <input type="color" name="esc_public_settings[warning_color]" value="<?php echo esc_attr( $public_settings['warning_color'] ); ?>">
+                            <p class="description"><?php esc_html_e( 'Farbe für Warnungen', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Fehlerfarbe (Offline)', 'easy-status-check' ); ?></th>
+                        <td>
+                            <input type="color" name="esc_public_settings[error_color]" value="<?php echo esc_attr( $public_settings['error_color'] ); ?>">
+                            <p class="description"><?php esc_html_e( 'Farbe für Offline-Status', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Hintergrundfarbe', 'easy-status-check' ); ?></th>
+                        <td>
+                            <input type="color" name="esc_public_settings[background_color]" value="<?php echo esc_attr( $public_settings['background_color'] ); ?>">
+                            <p class="description"><?php esc_html_e( 'Hintergrundfarbe der Seite', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Textfarbe', 'easy-status-check' ); ?></th>
+                        <td>
+                            <input type="color" name="esc_public_settings[text_color]" value="<?php echo esc_attr( $public_settings['text_color'] ); ?>">
+                            <p class="description"><?php esc_html_e( 'Haupttextfarbe', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Anzeigeoptionen', 'easy-status-check' ); ?></th>
+                        <td>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" name="esc_public_settings[show_response_time]" value="1" <?php checked( $public_settings['show_response_time'] ?? true ); ?>>
+                                <?php esc_html_e( 'Antwortzeiten anzeigen', 'easy-status-check' ); ?>
+                            </label>
+                            <label style="display: block;">
+                                <input type="checkbox" name="esc_public_settings[show_uptime]" value="1" <?php checked( $public_settings['show_uptime'] ?? true ); ?>>
+                                <?php esc_html_e( 'Verfügbarkeit (Uptime) anzeigen', 'easy-status-check' ); ?>
+                            </label>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th scope="row"><?php esc_html_e( 'Auto-Refresh Intervall', 'easy-status-check' ); ?></th>
+                        <td>
+                            <select name="esc_public_settings[refresh_interval]">
+                                <option value="0" <?php selected( $public_settings['refresh_interval'] ?? 300, 0 ); ?>><?php esc_html_e( 'Deaktiviert', 'easy-status-check' ); ?></option>
+                                <option value="60" <?php selected( $public_settings['refresh_interval'] ?? 300, 60 ); ?>>1 <?php esc_html_e( 'Minute', 'easy-status-check' ); ?></option>
+                                <option value="300" <?php selected( $public_settings['refresh_interval'] ?? 300, 300 ); ?>>5 <?php esc_html_e( 'Minuten', 'easy-status-check' ); ?></option>
+                                <option value="600" <?php selected( $public_settings['refresh_interval'] ?? 300, 600 ); ?>>10 <?php esc_html_e( 'Minuten', 'easy-status-check' ); ?></option>
+                            </select>
+                            <p class="description"><?php esc_html_e( 'Wie oft soll die Seite automatisch aktualisiert werden?', 'easy-status-check' ); ?></p>
+                        </td>
+                    </tr>
+                </table>
+                
+                <?php submit_button( __( 'Design-Einstellungen speichern', 'easy-status-check' ) ); ?>
+            </form>
+            
             <!-- Datenbank-Tools Sektion -->
             <hr style="margin: 40px 0;">
             
@@ -602,18 +807,33 @@ class ESC_Admin {
                     <p><em><?php esc_html_e( 'Klicken Sie auf "Status prüfen" um die Tabellen zu überprüfen...', 'easy-status-check' ); ?></em></p>
                 </div>
                 
-                <div class="esc-db-actions" style="margin-top: 20px;">
-                    <button type="button" class="button" id="esc-check-tables">
+                <div class="esc-db-actions">
+                    <button type="button" class="button button-primary" id="esc-check-tables">
                         <span class="dashicons dashicons-search"></span>
                         <?php esc_html_e( 'Status prüfen', 'easy-status-check' ); ?>
                     </button>
-                    <button type="button" class="button button-primary" id="esc-create-tables" disabled>
-                        <span class="dashicons dashicons-database-add"></span>
+                    <button type="button" class="button" id="esc-create-tables" disabled>
+                        <span class="dashicons dashicons-plus"></span>
                         <?php esc_html_e( 'Fehlende Tabellen erstellen', 'easy-status-check' ); ?>
                     </button>
                     <button type="button" class="button" id="esc-repair-tables" disabled>
                         <span class="dashicons dashicons-admin-tools"></span>
                         <?php esc_html_e( 'Tabellen reparieren & optimieren', 'easy-status-check' ); ?>
+                    </button>
+                </div>
+                
+                <div class="esc-db-danger-zone" style="margin-top: 30px; padding: 20px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 4px;">
+                    <h3 style="margin: 0 0 10px 0; color: #856404;">
+                        <span class="dashicons dashicons-warning" style="color: #ffc107;"></span>
+                        <?php esc_html_e( 'Gefahrenbereich', 'easy-status-check' ); ?>
+                    </h3>
+                    <p style="margin: 0 0 15px 0; color: #856404;">
+                        <strong><?php esc_html_e( 'WARNUNG:', 'easy-status-check' ); ?></strong>
+                        <?php esc_html_e( 'Diese Aktion löscht ALLE Daten aus allen Tabellen unwiderruflich! Services, Logs, Incidents und Benachrichtigungen werden permanent gelöscht.', 'easy-status-check' ); ?>
+                    </p>
+                    <button type="button" class="button button-link-delete" id="esc-reset-tables">
+                        <span class="dashicons dashicons-trash"></span>
+                        <?php esc_html_e( 'Alle Tabellen zurücksetzen (Daten löschen)', 'easy-status-check' ); ?>
                     </button>
                 </div>
             </div>
@@ -787,6 +1007,54 @@ class ESC_Admin {
                         } else {
                             $('#esc-db-status').prepend('<div class="esc-db-notification error">' + response.data.message + '</div>');
                         }
+                        button.html(originalHtml).prop('disabled', false);
+                    });
+                });
+                
+                // Tabellen zurücksetzen (GEFÄHRLICH!)
+                $('#esc-reset-tables').on('click', function() {
+                    var warningMessage = '⚠️ WARNUNG: ALLE DATEN WERDEN UNWIDERRUFLICH GELÖSCHT! ⚠️\n\n';
+                    warningMessage += '<?php esc_html_e( 'Dies betrifft:', 'easy-status-check' ); ?>\n';
+                    warningMessage += '• <?php esc_html_e( 'Alle Services', 'easy-status-check' ); ?>\n';
+                    warningMessage += '• <?php esc_html_e( 'Alle Status-Logs', 'easy-status-check' ); ?>\n';
+                    warningMessage += '• <?php esc_html_e( 'Alle Incidents', 'easy-status-check' ); ?>\n';
+                    warningMessage += '• <?php esc_html_e( 'Alle Benachrichtigungen', 'easy-status-check' ); ?>\n\n';
+                    warningMessage += '<?php esc_html_e( 'Möchten Sie wirklich fortfahren?', 'easy-status-check' ); ?>';
+                    
+                    if (!confirm(warningMessage)) {
+                        return;
+                    }
+                    
+                    // Zweite Bestätigung mit Texteingabe
+                    var confirmation = prompt('<?php esc_html_e( 'Geben Sie "RESET" ein, um zu bestätigen:', 'easy-status-check' ); ?>');
+                    
+                    if (confirmation !== 'RESET') {
+                        alert('<?php esc_html_e( 'Zurücksetzen abgebrochen. Die Bestätigung war nicht korrekt.', 'easy-status-check' ); ?>');
+                        return;
+                    }
+                    
+                    var button = $(this);
+                    var originalHtml = button.html();
+                    
+                    button.prop('disabled', true).html('<span class="dashicons dashicons-update spin"></span> <?php esc_html_e( 'Setze zurück...', 'easy-status-check' ); ?>');
+                    
+                    $.post(escAdmin.ajaxUrl, {
+                        action: 'esc_reset_tables',
+                        nonce: escAdmin.nonce,
+                        confirm: 'RESET'
+                    }, function(response) {
+                        if (response.success) {
+                            $('#esc-db-status').html('<div class="esc-db-notification success">' + response.data.message + '</div>');
+                            // Status neu prüfen nach 2 Sekunden
+                            setTimeout(function() {
+                                $('#esc-check-tables').trigger('click');
+                            }, 2000);
+                        } else {
+                            $('#esc-db-status').prepend('<div class="esc-db-notification error">' + response.data.message + '</div>');
+                        }
+                        button.html(originalHtml).prop('disabled', false);
+                    }).fail(function() {
+                        $('#esc-db-status').prepend('<div class="esc-db-notification error"><?php esc_html_e( 'Fehler beim Zurücksetzen der Tabellen.', 'easy-status-check' ); ?></div>');
                         button.html(originalHtml).prop('disabled', false);
                     });
                 });

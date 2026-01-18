@@ -87,7 +87,9 @@ final class Easy_Status_Check {
         require_once EASY_STATUS_CHECK_DIR . 'includes/class-performance-optimizer.php';
         require_once EASY_STATUS_CHECK_DIR . 'includes/class-security-manager.php';
         require_once EASY_STATUS_CHECK_DIR . 'includes/class-database-tools.php';
+        require_once EASY_STATUS_CHECK_DIR . 'includes/class-support-tools.php';
         require_once EASY_STATUS_CHECK_DIR . 'includes/class-public-status-page.php';
+        require_once EASY_STATUS_CHECK_DIR . 'includes/class-public-pages.php';
         require_once EASY_STATUS_CHECK_DIR . 'includes/admin.php';
         require_once EASY_STATUS_CHECK_DIR . 'includes/status-checker.php';
         require_once EASY_STATUS_CHECK_DIR . 'includes/frontend-display.php';
@@ -151,8 +153,16 @@ final class Easy_Status_Check {
             $GLOBALS['esc_database_tools'] = new ESC_Database_Tools();
         }
         
+        if ( class_exists( 'ESC_Support_Tools' ) && ! isset( $GLOBALS['esc_support_tools'] ) ) {
+            $GLOBALS['esc_support_tools'] = new ESC_Support_Tools();
+        }
+        
         if ( class_exists( 'ESC_Public_Status_Page' ) && ! isset( $GLOBALS['esc_public_status'] ) ) {
             $GLOBALS['esc_public_status'] = new ESC_Public_Status_Page();
+        }
+        
+        if ( class_exists( 'ESC_Public_Pages' ) && ! isset( $GLOBALS['esc_public_pages'] ) ) {
+            $GLOBALS['esc_public_pages'] = new ESC_Public_Pages();
         }
         
         if ( class_exists( 'ESC_Admin' ) && ! isset( $GLOBALS['esc_admin'] ) ) {
@@ -222,7 +232,13 @@ final class Easy_Status_Check {
             wp_schedule_event( time(), 'every_five_minutes', 'esc_status_check_cron' );
         }
         
-        // Flush rewrite rules
+        // Initialize public pages to register rewrite rules
+        if ( class_exists( 'ESC_Public_Pages' ) ) {
+            $public_pages = new ESC_Public_Pages();
+            $public_pages->register_public_pages();
+        }
+        
+        // Flush rewrite rules to activate public pages
         flush_rewrite_rules();
     }
     

@@ -318,26 +318,32 @@
                     nonce: escAdmin.nonce
                 },
                 beforeSend: function() {
-                    $('#esc-force-check').prop('disabled', true).text('Prüfe...');
+                    $('#esc-force-check').prop('disabled', true).html('<span class="dashicons dashicons-update spin"></span> Prüfe alle Services...');
+                    $('#esc-check-status').show().html('<span style="color: #f0b849;">⏳ Prüfung läuft...</span>');
                 },
                 success: function(response) {
                     if (response.success) {
+                        $('#esc-check-status').html('<span style="color: #00a32a;">✓ ' + response.data.message + '</span>');
                         ESCAdmin.showNotice(response.data.message, 'success');
-                        // Refresh status overview if present
-                        if ($('#esc-status-overview').length) {
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 2000);
-                        }
+                        
+                        // Reload page after 2 seconds
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
                     } else {
+                        $('#esc-check-status').html('<span style="color: #d63638;">✗ Fehler</span>');
                         ESCAdmin.showNotice(response.data.message, 'error');
                     }
                 },
                 error: function() {
+                    $('#esc-check-status').html('<span style="color: #d63638;">✗ Fehler bei der Prüfung</span>');
                     ESCAdmin.showNotice('Fehler bei der Status-Prüfung.', 'error');
                 },
                 complete: function() {
-                    $('#esc-force-check').prop('disabled', false).text('Sofortige Prüfung');
+                    $('#esc-force-check').prop('disabled', false).html('<span class="dashicons dashicons-update"></span> Alle Services jetzt prüfen');
+                    setTimeout(function() {
+                        $('#esc-check-status').fadeOut();
+                    }, 5000);
                 }
             });
         },
