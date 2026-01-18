@@ -1,0 +1,136 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the easySTATUSCheck package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: easySTATUSCheck 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: easySTATUSCheck.php:5
+msgid "Umfassende Status-Überwachung für Cloud-Services, Hosting-Anbieter und benutzerdefinierte Services. Ideal für IT-Administratoren und Systemmonitoring."
+msgstr ""
+
+#: includes/admin.php:26
+#: includes/admin.php:27
+msgid "Status Check"
+msgstr ""
+
+#: includes/admin.php:37
+msgid "Services verwalten"
+msgstr ""
+
+#: includes/admin.php:38
+msgid "Services"
+msgstr ""
+
+#: includes/admin.php:47
+#: includes/admin.php:48
+msgid "Einstellungen"
+msgstr ""
+
+#: includes/admin.php:57
+msgid "Status Übersicht"
+msgstr ""
+
+#: includes/admin.php:105
+msgid "Status Check Dashboard"
+msgstr ""
+
+#: includes/admin.php:124
+msgid "Gesamt Services"
+msgstr ""
+
+#: includes/admin.php:130
+msgid "Online"
+msgstr ""
+
+#: includes/admin.php:136
+msgid "Offline"
+msgstr ""
+
+#: includes/admin.php:150
+msgid "Kürzliche Statusänderungen"
+msgstr ""
+
+#: includes/admin.php:153
+msgid "Keine kürzlichen Änderungen gefunden."
+msgstr ""
+
+#: includes/admin.php:171
+msgid "her"
+msgstr ""
+
+#: includes/admin.php:182
+msgid "Schnellaktionen"
+msgstr ""
+
+#: includes/admin.php:186
+msgid "Services verwalten"
+msgstr ""
+
+#: includes/admin.php:190
+msgid "Status Übersicht"
+msgstr ""
+
+#: includes/admin.php:193
+msgid "Sofortige Prüfung"
+msgstr ""
+
+#: includes/admin.php:199
+msgid "Shortcode"
+msgstr ""
+
+#: includes/admin.php:200
+msgid "Verwenden Sie diesen Shortcode, um die Status-Anzeige auf Ihren Seiten einzubinden:"
+msgstr ""
+
+#: includes/admin.php:203
+msgid "Parameter: category=\"cloud|hosting|custom|all\", layout=\"grid|list\", refresh=\"300\""
+msgstr ""
+
+#: includes/frontend-display.php:109
+msgid "Service Status"
+msgstr ""
+
+#: includes/frontend-display.php:115
+msgid "Aktualisieren"
+msgstr ""
+
+#: includes/frontend-display.php:118
+msgid "Zuletzt aktualisiert:"
+msgstr ""
+
+#: includes/frontend-display.php:124
+msgid "Lade Service-Status..."
+msgstr ""
+
+#: includes/frontend-display.php:131
+msgid "Warnung"
+msgstr ""
+
+#: includes/frontend-display.php:139
+msgid "Unbekannt"
+msgstr ""
+
+#: includes/predefined-services.php:50
+msgid "Cloud Services"
+msgstr ""
+
+#: includes/predefined-services.php:183
+msgid "Hosting"
+msgstr ""
+
+#: includes/predefined-services.php:313
+msgid "Benutzerdefiniert"
+msgstr ""
