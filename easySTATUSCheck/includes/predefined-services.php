@@ -739,16 +739,33 @@ class ESC_Predefined_Services {
         
         $services_table = $wpdb->prefix . 'esc_services';
         $added_count = 0;
+        $errors = array();
         
-        foreach ( $services_data as $service ) {
+        // Debug: Log incoming data
+        error_log( 'ESC: add_predefined_services called with ' . count( $services_data ) . ' services' );
+        
+        // Check if table exists
+        $table_exists = $wpdb->get_var( "SHOW TABLES LIKE '$services_table'" ) === $services_table;
+        if ( ! $table_exists ) {
+            $errors[] = 'Datenbank-Tabelle existiert nicht: ' . $services_table;
+            error_log( 'ESC ERROR: Table does not exist: ' . $services_table );
+            set_transient( 'esc_last_service_errors', $errors, 300 );
+            return 0;
+        }
+        
+        foreach ( $services_data as $index => $service ) {
             // Handle both array and JSON string
             if ( is_string( $service ) ) {
                 $service = json_decode( $service, true );
             }
             
             if ( ! is_array( $service ) || empty( $service['name'] ) || empty( $service['url'] ) ) {
+                $errors[] = sprintf( 'Ungültige Service-Daten bei Index %d', $index );
+                error_log( 'ESC ERROR: Invalid service data at index ' . $index . ': ' . print_r( $service, true ) );
                 continue;
             }
+            
+            error_log( 'ESC: Processing service: ' . $service['name'] . ' - ' . $service['url'] );
             
             // Check if service URL already exists (only check URL, not name)
             $existing = $wpdb->get_var( $wpdb->prepare( 
@@ -756,32 +773,57 @@ class ESC_Predefined_Services {
                 $service['url']
             ) );
             
+            error_log( 'ESC: URL check for ' . $service['url'] . ' - Existing ID: ' . ( $existing ? $existing : 'none' ) );
+            
             if ( $existing ) {
+                $errors[] = sprintf( 'Service "%s" existiert bereits (ID: %d)', $service['name'], $existing );
+                error_log( 'ESC: Skipping duplicate service: ' . $service['name'] );
                 continue; // Skip if URL already exists
             }
             
             $service_data = array(
                 'name' => sanitize_text_field( $service['name'] ),
                 'url' => esc_url_raw( $service['url'] ),
-                'category' => sanitize_text_field( $service['category'] ),
+                'category' => sanitize_text_field( $service['category'] ?? 'custom' ),
                 'method' => sanitize_text_field( $service['method'] ?? 'GET' ),
                 'timeout' => intval( $service['timeout'] ?? 10 ),
                 'expected_code' => sanitize_text_field( $service['expected_code'] ?? '200' ),
                 'check_interval' => 300,
                 'enabled' => 1,
                 'notify_email' => 1,
-                'response_type' => sanitize_text_field( $service['response_type'] ?? null ),
-                'json_path' => sanitize_text_field( $service['json_path'] ?? null ),
+                'response_type' => isset( $service['response_type'] ) ? sanitize_text_field( $service['response_type'] ) : null,
+                'json_path' => isset( $service['json_path'] ) ? sanitize_text_field( $service['json_path'] ) : null,
                 'check_content' => intval( $service['check_content'] ?? 0 ),
                 'created_at' => current_time( 'mysql' ),
                 'updated_at' => current_time( 'mysql' )
             );
             
+            // Remove null values
+            $service_data = array_filter( $service_data, function( $value ) {
+                return $value !== null;
+            });
+            
+            error_log( 'ESC: Attempting to insert service: ' . $service['name'] );
+            error_log( 'ESC: Service data: ' . print_r( $service_data, true ) );
+            
             $result = $wpdb->insert( $services_table, $service_data );
-            if ( $result ) {
+            
+            if ( $result === false ) {
+                $errors[] = sprintf( 'Fehler beim Hinzufügen von "%s": %s', $service['name'], $wpdb->last_error );
+                error_log( 'ESC Service Insert Error for ' . $service['name'] . ': ' . $wpdb->last_error );
+                error_log( 'ESC Last Query: ' . $wpdb->last_query );
+            } else {
                 $added_count++;
+                error_log( 'ESC: Successfully added service: ' . $service['name'] . ' (ID: ' . $wpdb->insert_id . ')' );
             }
         }
+        
+        // Store errors for debugging
+        if ( ! empty( $errors ) ) {
+            set_transient( 'esc_last_service_errors', $errors, 300 );
+        }
+        
+        error_log( 'ESC: add_predefined_services completed - Added: ' . $added_count . ', Errors: ' . count( $errors ) );
         
         return $added_count;
     }

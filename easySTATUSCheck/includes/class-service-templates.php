@@ -922,7 +922,19 @@ class ESC_Service_Templates {
                 'count' => $result
             ) );
         } else {
-            wp_send_json_error( array( 'message' => __( 'Service existiert bereits oder konnte nicht hinzugefügt werden', 'easy-status-check' ) ) );
+            // Get detailed error messages
+            $errors = get_transient( 'esc_last_service_errors' );
+            $error_message = __( 'Service konnte nicht hinzugefügt werden', 'easy-status-check' );
+            
+            if ( ! empty( $errors ) ) {
+                $error_message .= ': ' . implode( ', ', $errors );
+                delete_transient( 'esc_last_service_errors' );
+            }
+            
+            wp_send_json_error( array( 
+                'message' => $error_message,
+                'errors' => $errors
+            ) );
         }
     }
 

@@ -458,6 +458,97 @@ class ESC_Status_History {
     }
 
     /**
+     * Handle CSV export via admin_init
+     */
+    public function handle_csv_export() {
+        if ( ! isset( $_GET['esc_export_csv'] ) || ! isset( $_GET['service_id'] ) ) {
+            return;
+        }
+        
+        if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'esc_export_history' ) ) {
+            wp_die( __( 'Sicherheitsüberprüfung fehlgeschlagen', 'easy-status-check' ) );
+        }
+        
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( __( 'Keine Berechtigung', 'easy-status-check' ) );
+        }
+        
+        $service_id = intval( $_GET['service_id'] );
+        $period = isset( $_GET['period'] ) ? sanitize_text_field( $_GET['period'] ) : '24h';
+        
+        $this->export_csv( $service_id, $period );
+        exit;
+    }
+    
+    /**
+     * Export history data as CSV
+     */
+    private function export_csv( $service_id, $period ) {
+        global $wpdb;
+        
+        $services_table = $wpdb->prefix . 'esc_services';
+        $logs_table = $wpdb->prefix . 'esc_status_logs';
+        
+        $service = $wpdb->get_row( $wpdb->prepare(
+            "SELECT * FROM $services_table WHERE id = %d",
+            $service_id
+        ) );
+        
+        if ( ! $service ) {
+            wp_die( __( 'Service nicht gefunden', 'easy-status-check' ) );
+        }
+        
+        // Calculate date range
+        $period_map = array(
+            '24h' => '24 HOUR',
+            '7d' => '7 DAY',
+            '30d' => '30 DAY',
+            '90d' => '90 DAY',
+        );
+        
+        $interval = isset( $period_map[ $period ] ) ? $period_map[ $period ] : '24 HOUR';
+        
+        $logs = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM $logs_table 
+            WHERE service_id = %d 
+            AND checked_at >= DATE_SUB(NOW(), INTERVAL $interval)
+            ORDER BY checked_at DESC",
+            $service_id
+        ) );
+        
+        // Set headers for CSV download
+        header( 'Content-Type: text/csv; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="status-history-' . sanitize_file_name( $service->name ) . '-' . date( 'Y-m-d' ) . '.csv"' );
+        
+        $output = fopen( 'php://output', 'w' );
+        
+        // Add BOM for Excel UTF-8 support
+        fprintf( $output, chr(0xEF).chr(0xBB).chr(0xBF) );
+        
+        // CSV headers
+        fputcsv( $output, array(
+            __( 'Zeitpunkt', 'easy-status-check' ),
+            __( 'Status', 'easy-status-check' ),
+            __( 'HTTP-Code', 'easy-status-check' ),
+            __( 'Antwortzeit (ms)', 'easy-status-check' ),
+            __( 'Fehlermeldung', 'easy-status-check' ),
+        ) );
+        
+        // CSV data
+        foreach ( $logs as $log ) {
+            fputcsv( $output, array(
+                $log->checked_at,
+                $log->status,
+                $log->http_code,
+                $log->response_time ? round( $log->response_time, 2 ) : '',
+                $log->error_message,
+            ) );
+        }
+        
+        fclose( $output );
+    }
+    
+    /**
      * AJAX: Export history as CSV
      */
     public function ajax_export_history() {

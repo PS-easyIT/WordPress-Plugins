@@ -577,6 +577,26 @@ class ESC_Admin {
                 <?php esc_html_e( 'Verwalten Sie die Datenbank-Tabellen des Plugins. Hier können Sie fehlende Tabellen neu erstellen oder vorhandene Tabellen reparieren.', 'easy-status-check' ); ?>
             </p>
             
+            <?php
+            // Show last service errors if any
+            $last_errors = get_transient( 'esc_last_service_errors' );
+            if ( ! empty( $last_errors ) ) :
+            ?>
+                <div class="notice notice-error">
+                    <p><strong><?php esc_html_e( 'Letzte Service-Fehler:', 'easy-status-check' ); ?></strong></p>
+                    <ul>
+                        <?php foreach ( $last_errors as $error ) : ?>
+                            <li><?php echo esc_html( $error ); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <p>
+                        <button type="button" class="button" onclick="jQuery.post(ajaxurl, {action: 'esc_clear_errors'}, function() { location.reload(); })">
+                            <?php esc_html_e( 'Fehler löschen', 'easy-status-check' ); ?>
+                        </button>
+                    </p>
+                </div>
+            <?php endif; ?>
+            
             <div class="esc-database-tools">
                 <div class="esc-db-status" id="esc-db-status">
                     <p><em><?php esc_html_e( 'Klicken Sie auf "Status prüfen" um die Tabellen zu überprüfen...', 'easy-status-check' ); ?></em></p>

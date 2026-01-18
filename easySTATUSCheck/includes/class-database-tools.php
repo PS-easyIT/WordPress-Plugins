@@ -15,6 +15,15 @@ class ESC_Database_Tools {
         add_action( 'wp_ajax_esc_check_tables', array( $this, 'ajax_check_tables' ) );
         add_action( 'wp_ajax_esc_create_tables', array( $this, 'ajax_create_tables' ) );
         add_action( 'wp_ajax_esc_repair_tables', array( $this, 'ajax_repair_tables' ) );
+        add_action( 'wp_ajax_esc_clear_errors', array( $this, 'ajax_clear_errors' ) );
+    }
+    
+    /**
+     * AJAX: Clear error transients
+     */
+    public function ajax_clear_errors() {
+        delete_transient( 'esc_last_service_errors' );
+        wp_send_json_success();
     }
 
     /**
