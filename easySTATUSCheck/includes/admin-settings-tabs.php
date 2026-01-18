@@ -270,6 +270,38 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
             <!-- SUPPORT TAB -->
             <h2><?php esc_html_e( 'Support & System-Status', 'easy-status-check' ); ?></h2>
             
+            <!-- Hilfe & Dokumentation -->
+            <div style="background: #fff; padding: 20px; border-left: 4px solid #2271b1; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0;"><?php esc_html_e( '📖 Hilfe & Dokumentation', 'easy-status-check' ); ?></h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 15px;">
+                    <div>
+                        <h4><?php esc_html_e( 'Schnellstart', 'easy-status-check' ); ?></h4>
+                        <ol style="margin: 10px 0; padding-left: 20px;">
+                            <li><?php esc_html_e( 'Gehen Sie zu "Services" und fügen Sie Services hinzu (Templates oder manuell)', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'Aktivieren Sie die Services die Sie überwachen möchten', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'Konfigurieren Sie unter "Einstellungen" die Public Pages und Benachrichtigungen', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'Besuchen Sie die Public Status Page um den aktuellen Status zu sehen', 'easy-status-check' ); ?></li>
+                        </ol>
+                    </div>
+                    
+                    <div>
+                        <h4><?php esc_html_e( 'Wichtige Hinweise', 'easy-status-check' ); ?></h4>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li><?php esc_html_e( 'Nach URL-Änderungen: Permalinks neu speichern (Einstellungen → Permalinks)', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'History-Daten: Services müssen aktiviert sein und geprüft werden', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'Cron-Jobs: Werden automatisch bei Service-Aktivierung angelegt', 'easy-status-check' ); ?></li>
+                            <li><?php esc_html_e( 'CVE-Feeds: Werden auf der Public Incidents Page angezeigt', 'easy-status-check' ); ?></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f1;">
+                    <strong><?php esc_html_e( 'Weitere Informationen:', 'easy-status-check' ); ?></strong>
+                    Vollständige Dokumentation finden Sie in der <code>README.md</code> Datei im Plugin-Verzeichnis.
+                </div>
+            </div>
+            
             <style>
                 .esc-support-grid {
                     display: grid;

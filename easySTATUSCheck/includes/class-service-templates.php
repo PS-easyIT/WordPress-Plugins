@@ -218,6 +218,473 @@ class ESC_Service_Templates {
                     'json_path' => 'status.indicator',
                 ),
             ),
+            'Cloud-Anbieter (AWS, Azure, GCP)' => array(
+                array(
+                    'name' => 'AWS Status',
+                    'url' => 'https://status.aws.amazon.com',
+                    'category' => 'cloud',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Azure Status',
+                    'url' => 'https://status.azure.com/en-us/status',
+                    'category' => 'cloud',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Google Cloud Status',
+                    'url' => 'https://status.cloud.google.com',
+                    'category' => 'cloud',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'DigitalOcean Status',
+                    'url' => 'https://status.digitalocean.com/api/v2/status.json',
+                    'category' => 'cloud',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Linode Status',
+                    'url' => 'https://status.linode.com/api/v2/status.json',
+                    'category' => 'cloud',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Vultr Status',
+                    'url' => 'https://status.vultr.com/api/v2/status.json',
+                    'category' => 'cloud',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+            ),
+            'Hosting-Anbieter' => array(
+                // Deutschland
+                array(
+                    'name' => 'IONOS (DE)',
+                    'url' => 'https://status.ionos.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Hetzner (DE)',
+                    'url' => 'https://status.hetzner.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Mittwald (DE)',
+                    'url' => 'https://status.mittwald.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Netcup (DE)',
+                    'url' => 'https://www.netcup-status.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'All-Inkl (DE)',
+                    'url' => 'https://all-inkl.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Strato (DE)',
+                    'url' => 'https://www.strato.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Host Europe (DE)',
+                    'url' => 'https://www.hosteurope.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'dogado (DE)',
+                    'url' => 'https://www.dogado.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Alfahosting (DE)',
+                    'url' => 'https://alfahosting.de',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // Frankreich
+                array(
+                    'name' => 'OVH (FR)',
+                    'url' => 'https://status.ovh.com/api/v2/status.json',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Scaleway (FR)',
+                    'url' => 'https://status.scaleway.com/api/v2/status.json',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Online.net (FR)',
+                    'url' => 'https://status.online.net',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // Niederlande
+                array(
+                    'name' => 'TransIP (NL)',
+                    'url' => 'https://status.transip.nl',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Byte (NL)',
+                    'url' => 'https://www.byte.nl',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Vimexx (NL)',
+                    'url' => 'https://status.vimexx.nl',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // Österreich
+                array(
+                    'name' => 'World4You (AT)',
+                    'url' => 'https://www.world4you.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'easyname (AT)',
+                    'url' => 'https://www.easyname.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // Schweiz
+                array(
+                    'name' => 'Hostpoint (CH)',
+                    'url' => 'https://www.hostpoint.ch',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Infomaniak (CH)',
+                    'url' => 'https://www.infomaniak.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'cyon (CH)',
+                    'url' => 'https://www.cyon.ch',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                
+                // USA
+                array(
+                    'name' => 'GoDaddy (US)',
+                    'url' => 'https://status.godaddy.com/api/v2/status.json',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Bluehost (US)',
+                    'url' => 'https://www.bluehost.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'HostGator (US)',
+                    'url' => 'https://www.hostgator.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'SiteGround (US)',
+                    'url' => 'https://status.siteground.com/api/v2/status.json',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'DreamHost (US)',
+                    'url' => 'https://www.dreamhoststatus.com/api/v2/status.json',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'A2 Hosting (US)',
+                    'url' => 'https://www.a2hosting.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'InMotion Hosting (US)',
+                    'url' => 'https://www.inmotionhosting.com',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Hostinger (US)',
+                    'url' => 'https://statuspage.hostinger.com/api/v2/status.json',
+                    'category' => 'hosting',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+            ),
+            'DevOps & CI/CD' => array(
+                array(
+                    'name' => 'GitHub Status',
+                    'url' => 'https://www.githubstatus.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'GitLab Status',
+                    'url' => 'https://status.gitlab.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Bitbucket Status',
+                    'url' => 'https://status.bitbucket.org/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Docker Hub Status',
+                    'url' => 'https://status.docker.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Jenkins Status',
+                    'url' => 'https://status.jenkins.io/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+            ),
+            'Security & SSL' => array(
+                array(
+                    'name' => 'Let\'s Encrypt Status',
+                    'url' => 'https://letsencrypt.status.io/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Cloudflare SSL',
+                    'url' => 'https://www.cloudflarestatus.com',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Sucuri Security',
+                    'url' => 'https://status.sucuri.net/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+            ),
+            'E-Mail Services' => array(
+                array(
+                    'name' => 'Gmail Status',
+                    'url' => 'https://www.google.com/appsstatus/dashboard/',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Mailgun Status',
+                    'url' => 'https://status.mailgun.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'SendGrid Status',
+                    'url' => 'https://status.sendgrid.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Postmark Status',
+                    'url' => 'https://status.postmarkapp.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+            ),
+            'Datenbanken & Storage' => array(
+                array(
+                    'name' => 'MongoDB Atlas Status',
+                    'url' => 'https://status.mongodb.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Redis Cloud Status',
+                    'url' => 'https://status.redislabs.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+                array(
+                    'name' => 'Amazon S3 Status',
+                    'url' => 'https://status.aws.amazon.com',
+                    'category' => 'cloud',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                ),
+                array(
+                    'name' => 'Backblaze B2 Status',
+                    'url' => 'https://status.backblaze.com/api/v2/status.json',
+                    'category' => 'custom',
+                    'method' => 'GET',
+                    'expected_code' => '200',
+                    'timeout' => 15,
+                    'response_type' => 'json',
+                    'json_path' => 'status.indicator',
+                ),
+            ),
             'DNS Services' => array(
                 array(
                     'name' => 'Cloudflare DNS (1.1.1.1)',
@@ -311,6 +778,12 @@ class ESC_Service_Templates {
         
         $custom_templates = $this->get_custom_templates();
         
+        // Korrekte Zählung aller Templates
+        $total_templates = 0;
+        foreach ( $all_templates as $category => $templates ) {
+            $total_templates += count( $templates );
+        }
+        
         ?>
         <div class="wrap">
             <h1><?php _e( 'Service-Templates', 'easy-status-check' ); ?></h1>
@@ -322,7 +795,7 @@ class ESC_Service_Templates {
                 </div>
                 <div class="esc-template-stats">
                     <span class="esc-stat-item">
-                        <strong><?php echo count( $all_templates, COUNT_RECURSIVE ) - count( $all_templates ); ?></strong>
+                        <strong><?php echo $total_templates; ?></strong>
                         <?php _e( 'Vordefinierte Templates', 'easy-status-check' ); ?>
                     </span>
                     <span class="esc-stat-item">
@@ -336,9 +809,9 @@ class ESC_Service_Templates {
                 <div class="esc-templates-sidebar">
                     <h2><?php _e( 'Kategorien', 'easy-status-check' ); ?></h2>
                     <ul class="esc-category-list">
-                        <li><a href="#all" class="active" data-count="<?php echo count( $all_templates, COUNT_RECURSIVE ) - count( $all_templates ); ?>">
+                        <li><a href="#all" class="active" data-count="<?php echo $total_templates; ?>">
                             <?php _e( 'Alle Templates', 'easy-status-check' ); ?>
-                            <span class="count">(<?php echo count( $all_templates, COUNT_RECURSIVE ) - count( $all_templates ); ?>)</span>
+                            <span class="count">(<?php echo $total_templates; ?>)</span>
                         </a></li>
                         <?php foreach ( $all_templates as $category => $templates ) : ?>
                             <li><a href="#<?php echo esc_attr( sanitize_title( $category ) ); ?>" data-count="<?php echo count( $templates ); ?>">

@@ -7,16 +7,21 @@
 
 Ein professionelles WordPress-Plugin zur Überwachung von Cloud-Services, Hosting-Anbietern und benutzerdefinierten Services. Entwickelt speziell für IT-Administratoren und Systemmonitoring.
 
+**Autor:** Andreas Hepp  
+**Webseite:** [phinit.de](https://phinit.de)  
+**Letzte Aktualisierung:** 18.01.2026
+
 ## 🚀 Features
 
 ### ✨ Hauptfunktionen
 - **Umfassende Service-Überwachung** - Überwachen Sie Cloud-Services, Hosting-Anbieter und eigene Webadressen
-- **Moderne UX-Oberfläche** - Benutzerfreundliche und responsive Darstellung des Service-Status
-- **Vordefinierte Services** - Über 50 vordefinierte Services für gängige Anbieter wie MS365, AWS, Google Cloud, IONOS, Hetzner, etc.
-- **Flexible Konfiguration** - Vollständig anpassbare Service-Einstellungen im Admin-Bereich
+- **Moderne Admin-Oberfläche** - Komplett überarbeitetes Dashboard mit 3-Spalten Grid-Layout
+- **40+ Vordefinierte Services** - IT-Services in 8 Kategorien: Cloud, Hosting, DevOps, Security, E-Mail, Datenbanken, DNS, Monitoring
+- **Public Status Pages** - Öffentliche Seiten für Services, Incidents und History
+- **CVE/Incident Tracking** - Integration von Sicherheitswarnungen und RSS-Feeds
 - **Automatische Benachrichtigungen** - E-Mail-Alerts bei Statusänderungen
-- **Echtzeit-Updates** - Automatische Aktualisierung der Status-Anzeige
-- **Shortcode-Integration** - Einfache Einbindung in Seiten und Beiträge
+- **History & Analytics** - Detaillierte Uptime-Statistiken mit Chart.js Visualisierung
+- **Template-System** - Schnelles Hinzufügen von Services aus vorgefertigten Templates
 
 ### 🔧 Technische Features
 - **HTTP/HTTPS Monitoring** - Unterstützung für GET, POST und HEAD Anfragen
@@ -73,44 +78,74 @@ Verwenden Sie den `[easy_status_display]` Shortcode, um die Status-Anzeige auf I
 [easy_status_display columns="4" show_uptime="false"]
 ```
 
-### Admin-Funktionen
+### Admin-Menü Struktur
 
-#### Dashboard
-- **Service-Übersicht** - Gesamtanzahl, Online/Offline Services
+#### 1. Dashboard
+- **Service-Übersicht** - Gesamtanzahl, Online/Offline Services im 3-Spalten Grid
+- **Schnellaktionen** - Service hinzufügen, Alle prüfen, Zu Public Pages
 - **Kürzliche Änderungen** - Historie der letzten Statusänderungen
-- **Sofortige Prüfung** - Manuelle Status-Prüfung aller Services
 
-#### Service-Verwaltung
-- **Services hinzufügen** - Eigene Services mit vollständiger Konfiguration
-- **Vordefinierte Services** - Schnelles Hinzufügen bekannter Services
-- **Bulk-Aktionen** - Mehrere Services gleichzeitig verwalten
-- **Import/Export** - Services zwischen Installationen übertragen
+#### 2. Services
+- **Service-Verwaltung** - Alle Services in 3-Spalten Grid-Layout
+- **Schnellaktionen** - Aktivieren/Deaktivieren, Prüfen, Bearbeiten, Löschen
+- **Service hinzufügen** - Manuell oder aus Templates
 
-#### Einstellungen
-- **Standard-Intervalle** - Globale Prüfintervalle festlegen
-- **E-Mail-Benachrichtigungen** - Notification-Einstellungen
-- **Timeout-Konfiguration** - Standard-Timeout für neue Services
+#### 3. History
+- **Graph Cards** - Alle aktiven Services als Mini-Charts (3 Spalten)
+- **Uptime-Statistiken** - Prozentsatz, Durchschnittszeit, Anzahl Checks
+- **Zeitraum-Auswahl** - 24h, 7d, 30d, 90d
+- **Chart.js Integration** - Visualisierung der Status-Historie
 
-## 🌐 Vordefinierte Services
+#### 4. Templates
+- **8 Kategorien** - Cloud, Hosting (DE), DevOps, Security, E-Mail, Datenbanken, DNS, Monitoring
+- **40+ Services** - AWS, Azure, GCP, GitHub, GitLab, Docker, MongoDB, etc.
+- **Einzelne Templates** - Kein Bulk-Add, nur einzeln hinzufügen
 
-Das Plugin enthält über 50 vordefinierte Services in verschiedenen Kategorien:
+#### 5. Incidents
+- **CVE RSS Feeds** - Integration von Sicherheitswarnungen
+- **Feed-Verwaltung** - Name und URL für RSS-Feeds
+- **Max Items** - Anzahl der angezeigten CVE-Items (5-50)
+- **Public Incidents Page** - Öffentliche Anzeige der Incidents
 
-### Cloud Services
-- **Microsoft 365** - Office 365, Teams, OneDrive, Outlook
-- **Amazon Web Services** - AWS Console, S3, CloudFront
-- **Google Cloud** - GCP Console, Workspace, Gmail, Drive
-- **Weitere** - GitHub, GitLab, Slack, Zoom, Dropbox
+#### 6. Einstellungen (4 Tabs)
+- **Allgemein** - Public Pages aktivieren, Basis-URL, Prüfintervall, Timeout
+- **Benachrichtigungen** - E-Mail-Alerts aktivieren, Empfänger-Adresse
+- **Design** - 6 Farbeinstellungen, Anzeigeoptionen, Auto-Refresh
+- **Support** - System-Status, Datenbank-Tools, Cron-Status, Hilfe
 
-### Hosting-Anbieter
-- **Deutsche Anbieter** - IONOS, Hetzner, Strato, All-Inkl, Mittwald, Netcup
-- **Internationale Anbieter** - DigitalOcean, Linode, Vultr, OVH
-- **CDN-Anbieter** - Cloudflare, KeyCDN, BunnyCDN
+## 🌐 Vordefinierte Service-Templates
 
-### IT-Services
-- **Monitoring** - Pingdom, New Relic, Datadog
-- **DNS** - Cloudflare DNS, Google DNS, Quad9
-- **Security** - Let's Encrypt, Sucuri, Wordfence
-- **Communication** - Discord, Telegram, WhatsApp Business
+Das Plugin enthält 40+ vordefinierte IT-Services in 8 professionellen Kategorien:
+
+### 1. Microsoft 365
+- Microsoft 365 Status, Teams, Exchange Online, SharePoint Online, OneDrive for Business
+
+### 2. Cloud-Anbieter (AWS, Azure, GCP)
+- AWS Status, Azure Status, Google Cloud Status, DigitalOcean, Linode, Vultr
+
+### 3. Hosting-Anbieter
+- IONOS, Hetzner, Mittwald, Netcup, All-Inkl, Strato
+
+### 4. CDN & Performance
+- Cloudflare CDN, Fastly CDN, KeyCDN, BunnyCDN
+
+### 5. DevOps & CI/CD
+- GitHub Status, GitLab Status, Bitbucket Status, Docker Hub, Jenkins
+
+### 6. Security & SSL
+- Let's Encrypt Status, Cloudflare SSL, Sucuri Security
+
+### 7. E-Mail Services
+- Gmail Status, Mailgun Status, SendGrid Status, Postmark Status
+
+### 8. Datenbanken & Storage
+- MongoDB Atlas, Redis Cloud, Amazon S3, Backblaze B2
+
+### 9. DNS Services
+- Cloudflare DNS (1.1.1.1), Google DNS (8.8.8.8), Quad9 DNS
+
+### 10. Monitoring & Analytics
+- Google Analytics, New Relic, Datadog, Pingdom
 
 ## ⚙️ Konfiguration
 
@@ -161,22 +196,34 @@ User-Agent: MyCustomBot/1.0
 X-API-Key: your-api-key
 ```
 
-## 📊 Status-Anzeige
+## 📊 Public Status Pages
+
+### Öffentliche Seiten
+Das Plugin bietet 3 öffentliche Status-Seiten:
+
+#### 1. Services Status Page
+- **URL:** `yoursite.com/status/services`
+- **Anzeige:** Alle aktiven Services im Grid-Layout
+- **Echtzeit-Status:** Online/Offline mit Farbcodierung
+- **Details:** Uptime, Antwortzeit, letzte Prüfung
+
+#### 2. Incidents/CVE Page
+- **URL:** `yoursite.com/status/incidents`
+- **CVE RSS Feeds:** Integration von Sicherheitswarnungen
+- **Anzeige:** Aktuelle Incidents und Sicherheitsmeldungen
+- **Konfigurierbar:** Anzahl der Items pro Feed
+
+#### 3. History Page
+- **URL:** `yoursite.com/status/history/[service-id]`
+- **Charts:** Visualisierung der Service-Historie
+- **Statistiken:** Uptime, Durchschnittszeit, Anzahl Checks
+- **Zeiträume:** 24h, 7d, 30d, 90d
 
 ### Status-Typen
 - 🟢 **Online** - Service ist erreichbar und antwortet erwartungsgemäß
 - 🔴 **Offline** - Service ist nicht erreichbar oder antwortet mit Fehlern
 - 🟡 **Warnung** - Service antwortet, aber nicht mit erwarteten Codes
 - ⚪ **Unbekannt** - Service wurde noch nicht geprüft
-
-### Anzeige-Elemente
-- **Service-Name und URL**
-- **Aktueller Status mit visueller Anzeige**
-- **Uptime-Prozentsatz** (24h, 7d, 30d)
-- **Antwortzeit** in Millisekunden
-- **Letzte Prüfung** mit Zeitstempel
-- **Fehlerdetails** bei Problemen
-- **Erweiterte Details** (HTTP-Code, Methode, etc.)
 
 ## 🔔 Benachrichtigungen
 
@@ -290,26 +337,45 @@ wp plugin activate easySTATUSCheck
 - PSR-4 Autoloading
 - Semantic Versioning
 
-## 🔄 Changelog
+## �️ Support-Tools
 
-### Version 1.0.0
-- ✨ Initiale Veröffentlichung
-- 🎯 Service-Monitoring für Cloud und Hosting
-- 📊 Moderne Status-Anzeige
-- 🔔 E-Mail-Benachrichtigungen
-- 📱 Responsive Design
-- 🛠️ Admin-Interface
-- 📈 Uptime-Statistiken
-- 🔌 JSON-API Integration
-- 📡 RSS/XML Feed Support
-- 🎯 50+ Vordefinierte Status-APIs
-- 🔍 Intelligente Incident-Erkennung
-- 📊 Erweiterte Status-Parsing
-- 🎨 API-Type Indikatoren im Admin
-- 🚀 Automatische Datenbank-Migration
+### Datenbank-Tools
+- **Prüfen** - Überprüft ob alle Tabellen existieren
+- **Erstellen** - Erstellt fehlende Datenbank-Tabellen
+- **Optimieren** - Optimiert alle Plugin-Tabellen (OPTIMIZE TABLE)
+- **Reparieren** - Repariert beschädigte Tabellen (REPAIR TABLE)
+
+### Cron-Tools
+- **Prüfen** - Überprüft Cron-Status und geplante Jobs
+- **Manuell ausführen** - Führt alle Service-Checks sofort aus
+- **Status-Anzeige** - WordPress Cron aktiv/deaktiviert, Anzahl geplanter Jobs
+
+### System-Status
+- WordPress Version, PHP Version, MySQL Version, cURL Status
+- Plugin Version: 1.0.0
+
+## � Changelog
+
+### Version 1.0.0 (18.01.2026)
+- ✨ **Initiale Veröffentlichung**
+- 🎯 **Admin-Menü komplett überarbeitet** - Dashboard, Services, History, Templates, Incidents, Einstellungen
+- � **3-Spalten Grid-Layout** - Moderne Card-Darstellung für Services und History
+- � **Public Status Pages** - 3 öffentliche Seiten (Services, Incidents, History)
+- � **History mit Charts** - Chart.js Integration für visuelle Statistiken
+- 🔔 **CVE/Incident Tracking** - RSS-Feed Integration für Sicherheitswarnungen
+- 🎨 **4-Tab Einstellungen** - Allgemein, Benachrichtigungen, Design, Support
+- 🛠️ **Support-Tools** - Datenbank-Tools und Cron-Management
+- 🔌 **40+ IT-Service Templates** - 8 Kategorien mit professionellen Services
+- � **E-Mail-Benachrichtigungen** - Automatische Alerts bei Statusänderungen
+- 🔒 **Security** - Nonce-Schutz, Prepared Statements, XSS-Prevention
+- 🚀 **Performance** - Caching, Asynchrone Checks, Auto-Cleanup
 
 ---
 
-**Entwickelt mit ❤️ für die WordPress-Community**
+**Entwickelt mit ❤️ von Andreas Hepp**
 
-*easySTATUSCheck - Ihr zuverlässiger Partner für Service-Monitoring*
+*easySTATUSCheck - Professionelles Service-Monitoring für WordPress*
+
+**Webseite:** [phinit.de](https://phinit.de)  
+**Version:** 1.0.0  
+**Datum:** 18.01.2026

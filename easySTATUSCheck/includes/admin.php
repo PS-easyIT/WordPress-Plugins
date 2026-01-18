@@ -54,11 +54,11 @@ class ESC_Admin {
             array( $this, 'render_services' )
         );
         
-        // Note: History (Position 3), Templates (Position 4) und Incidents (Position 5) 
+        // Note: Templates (Position 3) und Incidents (Position 4) 
         // werden von ihren jeweiligen Klassen registriert
-        // ESC_Status_History adds 'easy-status-check-history' with priority 20
-        // ESC_Service_Templates adds 'easy-status-check-templates' with priority 30
-        // ESC_Incident_Tracker adds 'easy-status-check-incidents' with priority 40
+        // ESC_Service_Templates adds 'easy-status-check-templates' with priority 20
+        // ESC_Incident_Tracker adds 'easy-status-check-incidents' with priority 25
+        // History wurde aus Admin-Menü entfernt - nur noch öffentliche History-Seite verfügbar
 
         // Note: Einstellungen wird mit Priorität 100 am Ende registriert (siehe unten)
     }
@@ -347,6 +347,16 @@ class ESC_Admin {
                     <button type="button" class="button button-small esc-test-service" data-service-id="<?php echo esc_attr( $service->id ); ?>">
                         <?php esc_html_e( 'Testen', 'easy-status-check' ); ?>
                     </button>
+                    <?php 
+                    $public_enabled = get_option( 'esc_public_status_enabled', false );
+                    $public_slug = get_option( 'esc_public_status_slug', 'status' );
+                    if ( $public_enabled ) : 
+                    ?>
+                        <a href="<?php echo home_url( '/' . $public_slug . '/history/' . $service->id ); ?>" class="button button-small" target="_blank">
+                            <span class="dashicons dashicons-chart-line" style="margin-top: 3px;"></span>
+                            <?php esc_html_e( 'History', 'easy-status-check' ); ?>
+                        </a>
+                    <?php endif; ?>
                     <button type="button" class="button button-small button-link-delete esc-delete-service" data-service-id="<?php echo esc_attr( $service->id ); ?>">
                         <?php esc_html_e( 'Löschen', 'easy-status-check' ); ?>
                     </button>

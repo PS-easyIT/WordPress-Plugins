@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ESC_Status_History {
 
     public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_history_page' ), 15 ); // Position 3
+        // History-Seite aus Admin-Menü entfernt - nur noch öffentliche History-Seite verfügbar
+        // add_action( 'admin_menu', array( $this, 'add_history_page' ), 15 );
         add_action( 'wp_ajax_esc_get_history_data', array( $this, 'ajax_get_history_data' ) );
         add_action( 'admin_init', array( $this, 'handle_csv_export' ) );
         add_action( 'wp_ajax_esc_export_history', array( $this, 'ajax_export_history' ) );
@@ -69,6 +70,11 @@ class ESC_Status_History {
                 </form>
             </div>
             
+            <?php if ( empty( $services ) ) : ?>
+                <div class="notice notice-warning">
+                    <p><?php _e( 'Keine aktivierten Services gefunden. Bitte aktivieren Sie mindestens einen Service unter "Services".', 'easy-status-check' ); ?></p>
+                </div>
+            <?php else : ?>
             <div class="esc-history-grid">
                 <?php foreach ( $services as $service ) : ?>
                     <div class="esc-history-card" data-service-id="<?php echo esc_attr( $service->id ); ?>">
@@ -118,12 +124,11 @@ class ESC_Status_History {
                     </table>
                 </div>
             </div>
-            
-            <?php if ( empty( $services ) ) : ?>
-                <div class="notice notice-warning">
-                    <p><?php _e( 'Keine aktivierten Services gefunden. Bitte aktivieren Sie mindestens einen Service.', 'easy-status-check' ); ?></p>
-                </div>
             <?php endif; ?>
+            
+            <div class="notice notice-info" style="margin-top: 20px;">
+                <p><strong><?php _e( 'Hinweis:', 'easy-status-check' ); ?></strong> <?php _e( 'History-Daten werden erst nach der ersten Service-Prüfung angezeigt. Services müssen aktiviert sein und mindestens einmal geprüft worden sein.', 'easy-status-check' ); ?></p>
+            </div>
         </div>
         
         <style>
@@ -233,7 +238,17 @@ class ESC_Status_History {
                     if (response.success) {
                         updateServiceStats(serviceId, response.data.stats);
                         createServiceChart(serviceId, response.data.chart_data);
+                    } else {
+                        // Fehlerfall: Zeige "Keine Daten"
+                        $('[data-stat="uptime-' + serviceId + '"]').text('N/A');
+                        $('[data-stat="avgtime-' + serviceId + '"]').text('N/A');
+                        $('[data-stat="checks-' + serviceId + '"]').text('0');
                     }
+                }).fail(function() {
+                    // AJAX-Fehler: Zeige "Fehler"
+                    $('[data-stat="uptime-' + serviceId + '"]').text('Fehler');
+                    $('[data-stat="avgtime-' + serviceId + '"]').text('Fehler');
+                    $('[data-stat="checks-' + serviceId + '"]').text('0');
                 });
             }
             
