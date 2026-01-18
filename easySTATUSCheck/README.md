@@ -12,6 +12,14 @@ Ein professionelles WordPress-Plugin zur Überwachung von Cloud-Services, Hostin
 **Version:** 1.1.3  
 **Letzte Aktualisierung:** 18.01.2026
 
+## 🌐 Live-Demo
+
+Sehen Sie das Plugin in Aktion auf unserer Demo-Seite:
+
+- **[Status-Seite](https://beta.phinit.de/status/services/)** - Übersicht aller überwachten Services
+- **[Incidents-Seite](https://beta.phinit.de/status/incidents/)** - CVE-Feeds und Sicherheitsvorfälle
+- **[History-Beispiel](https://beta.phinit.de/status/history/22/)** - Detaillierte Service-Historie mit Statistiken
+
 ## 🚀 Features
 
 ### ✨ Hauptfunktionen

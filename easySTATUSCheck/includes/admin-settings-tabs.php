@@ -42,7 +42,10 @@ if ( isset( $_POST['esc_save_settings'] ) && wp_verify_nonce( $_POST['_wpnonce']
                 'text_color' => sanitize_hex_color( $_POST['text_color'] ?? '#1d2327' ),
                 'show_response_time' => isset( $_POST['show_response_time'] ),
                 'show_uptime' => isset( $_POST['show_uptime'] ),
-                'refresh_interval' => intval( $_POST['refresh_interval'] ?? 300 )
+                'refresh_interval' => intval( $_POST['refresh_interval'] ?? 300 ),
+                'columns' => intval( $_POST['columns'] ?? 3 ),
+                'page_title' => sanitize_text_field( $_POST['page_title'] ?? 'Service Status' ),
+                'page_description' => sanitize_text_field( $_POST['page_description'] ?? 'Aktuelle Status-Informationen unserer Services' )
             );
             update_option( 'esc_public_settings', $public_settings );
             break;
@@ -63,7 +66,10 @@ $public_settings = get_option( 'esc_public_settings', array(
     'text_color' => '#1d2327',
     'show_response_time' => true,
     'show_uptime' => true,
-    'refresh_interval' => 300
+    'refresh_interval' => 300,
+    'columns' => 3,
+    'page_title' => 'Service Status',
+    'page_description' => 'Aktuelle Status-Informationen unserer Services'
 ) );
 $public_status_enabled = get_option( 'esc_public_status_enabled', false );
 $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
@@ -191,6 +197,22 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
             
             <table class="form-table">
                 <tr>
+                    <th scope="row"><?php esc_html_e( 'Seitentitel', 'easy-status-check' ); ?></th>
+                    <td>
+                        <input type="text" name="page_title" value="<?php echo esc_attr( $public_settings['page_title'] ); ?>" class="regular-text">
+                        <p class="description"><?php esc_html_e( 'Titel der öffentlichen Status-Seiten', 'easy-status-check' ); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Seitenbeschreibung', 'easy-status-check' ); ?></th>
+                    <td>
+                        <input type="text" name="page_description" value="<?php echo esc_attr( $public_settings['page_description'] ); ?>" class="large-text">
+                        <p class="description"><?php esc_html_e( 'Beschreibung unter dem Titel', 'easy-status-check' ); ?></p>
+                    </td>
+                </tr>
+                
+                <tr>
                     <th scope="row"><?php esc_html_e( 'Primärfarbe', 'easy-status-check' ); ?></th>
                     <td>
                         <input type="color" name="primary_color" value="<?php echo esc_attr( $public_settings['primary_color'] ); ?>">
@@ -249,6 +271,19 @@ $public_status_slug = get_option( 'esc_public_status_slug', 'status' );
                             <input type="checkbox" name="show_uptime" value="1" <?php checked( $public_settings['show_uptime'] ); ?>>
                             <?php esc_html_e( 'Uptime-Statistiken anzeigen', 'easy-status-check' ); ?>
                         </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Spaltenanzahl (Services)', 'easy-status-check' ); ?></th>
+                    <td>
+                        <select name="columns" class="regular-text">
+                            <option value="1" <?php selected( $public_settings['columns'], 1 ); ?>>1 <?php esc_html_e( 'Spalte', 'easy-status-check' ); ?></option>
+                            <option value="2" <?php selected( $public_settings['columns'], 2 ); ?>>2 <?php esc_html_e( 'Spalten', 'easy-status-check' ); ?></option>
+                            <option value="3" <?php selected( $public_settings['columns'], 3 ); ?>>3 <?php esc_html_e( 'Spalten', 'easy-status-check' ); ?></option>
+                            <option value="4" <?php selected( $public_settings['columns'], 4 ); ?>>4 <?php esc_html_e( 'Spalten', 'easy-status-check' ); ?></option>
+                        </select>
+                        <p class="description"><?php esc_html_e( 'Anzahl der Service-Cards nebeneinander auf der öffentlichen Status-Seite', 'easy-status-check' ); ?></p>
                     </td>
                 </tr>
                 

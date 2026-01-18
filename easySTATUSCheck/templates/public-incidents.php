@@ -17,18 +17,20 @@ $public_settings = get_option( 'esc_public_settings', array(
     'primary_color' => '#2271b1',
     'error_color' => '#d63638',
     'background_color' => '#f0f0f1',
-    'text_color' => '#1d2327'
+    'text_color' => '#1d2327',
+    'page_title' => 'Service Status',
+    'page_description' => 'Aktuelle Status-Informationen unserer Services'
 ) );
 
 /**
  * Fetch CVE feed data
  */
 function esc_fetch_cve_feed( $url, $max_items = 10 ) {
-    $transient_key = 'esc_cve_feed_' . md5( $url );
+    $transient_key = 'esc_cve_feed_' . md5( $url . '_' . $max_items );
     $cached = get_transient( $transient_key );
     
     if ( $cached !== false ) {
-        return array_slice( $cached, 0, $max_items );
+        return $cached;
     }
     
     $response = wp_remote_get( $url, array( 'timeout' => 15 ) );
@@ -68,105 +70,313 @@ get_header();
 ?>
 
 <style>
+    :root {
+        --esc-primary: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
+        --esc-error: <?php echo esc_attr( $public_settings['error_color'] ); ?>;
+        --esc-bg: <?php echo esc_attr( $public_settings['background_color'] ); ?>;
+        --esc-text: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
+        --esc-border-radius: 12px;
+        --esc-shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+        --esc-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        --esc-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    
+    body.esc-public-page {
+        background: var(--esc-bg);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    
     .esc-public-incidents {
         max-width: 1400px;
-        margin: 40px auto;
-        padding: 0 20px;
+        margin: 0 auto;
+        padding: 60px 24px;
     }
     
     .esc-public-header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 48px;
+        animation: fadeInDown 0.6s ease-out;
+        background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+        padding: 40px 32px;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-md);
+        border: 1px solid #e5e7eb;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 48px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .esc-public-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--esc-primary), var(--esc-error));
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .esc-public-header h1 {
-        font-size: 36px;
-        margin-bottom: 10px;
-        color: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
+        font-size: clamp(28px, 4vw, 40px);
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--esc-text);
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+    
+    .esc-public-header p {
+        font-size: 16px;
+        color: #6b7280;
+        margin: 0;
+        line-height: 1.6;
     }
     
     .esc-public-nav {
         display: flex;
         justify-content: center;
-        gap: 20px;
-        margin-bottom: 40px;
+        gap: 12px;
+        margin-bottom: 48px;
         flex-wrap: wrap;
+        animation: fadeIn 0.6s ease-out 0.2s both;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     
     .esc-public-nav a {
-        padding: 12px 24px;
+        padding: 14px 28px;
         background: #fff;
-        border-radius: 6px;
+        border-radius: var(--esc-border-radius);
         text-decoration: none;
-        color: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
-        border: 2px solid transparent;
-        transition: all 0.3s;
-        font-weight: 500;
+        color: var(--esc-text);
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+        font-size: 15px;
+        box-shadow: var(--esc-shadow-sm);
     }
     
     .esc-public-nav a.active {
-        border-color: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
-        background: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
+        border-color: var(--esc-primary);
+        background: var(--esc-primary);
         color: #fff;
+        box-shadow: var(--esc-shadow-md);
+        transform: translateY(-1px);
     }
     
     .esc-public-nav a:hover:not(.active) {
-        border-color: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
+        border-color: var(--esc-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--esc-shadow-md);
     }
     
     .esc-cve-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
+        animation: fadeIn 0.6s ease-out 0.4s both;
     }
     
     .esc-cve-feed-section {
-        margin-bottom: 40px;
+        margin-bottom: 48px;
     }
     
     .esc-cve-feed-section h2 {
         margin-bottom: 20px;
         font-size: 24px;
-        color: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
+        font-weight: 700;
+        color: var(--esc-text);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.01em;
+    }
+    
+    .esc-cve-feed-section h2::before {
+        content: '';
+        width: 4px;
+        height: 28px;
+        background: linear-gradient(to bottom, var(--esc-error), transparent);
+        border-radius: 2px;
     }
     
     .esc-cve-card {
         background: #fff;
         padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-left: 4px solid <?php echo esc_attr( $public_settings['error_color'] ); ?>;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-sm);
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid var(--esc-error);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    a.esc-cve-card {
+        cursor: pointer;
+    }
+    
+    .esc-cve-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--esc-error);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .esc-cve-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--esc-shadow-lg);
+        border-color: var(--esc-error);
+    }
+    
+    a.esc-cve-card:hover h3 {
+        color: color-mix(in srgb, var(--esc-error) 85%, black);
+    }
+    
+    .esc-cve-card:hover::before {
+        transform: scaleY(1);
     }
     
     .esc-cve-card h3 {
-        font-size: 18px;
+        font-size: 16px;
+        font-weight: 700;
         margin-bottom: 10px;
-        color: <?php echo esc_attr( $public_settings['error_color'] ); ?>;
+        color: var(--esc-error);
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
     
     .esc-cve-date {
         font-size: 13px;
-        color: #999;
-        margin-bottom: 10px;
+        color: #9ca3af;
+        margin-bottom: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: #f9fafb;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+    
+    .esc-cve-date::before {
+        content: '🕐';
     }
     
     .esc-cve-description {
-        font-size: 14px;
-        color: #666;
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-top: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .esc-no-feeds {
+        text-align: center;
+        padding: 80px 20px;
+        background: #fff;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-sm);
+        animation: fadeIn 0.6s ease-out 0.4s both;
+    }
+    
+    .esc-no-feeds h2 {
+        font-size: 24px;
+        color: var(--esc-text);
+        margin-bottom: 12px;
+        font-weight: 700;
+    }
+    
+    .esc-no-feeds p {
+        color: #6b7280;
+        font-size: 16px;
         line-height: 1.6;
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
+        .esc-cve-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 900px) {
         .esc-cve-grid {
             grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .esc-public-incidents {
+            padding: 40px 16px;
+        }
+        
+        .esc-public-header h1 {
+            font-size: 32px;
+        }
+        
+        .esc-public-header p {
+            font-size: 16px;
+        }
+        
+        .esc-cve-feed-section h2 {
+            font-size: 20px;
+        }
+        
+        .esc-cve-card {
+            padding: 16px;
+        }
+        
+        .esc-cve-card h3 {
+            font-size: 15px;
+        }
+        
+        .esc-public-nav {
+            gap: 8px;
+        }
+        
+        .esc-public-nav a {
+            padding: 12px 20px;
+            font-size: 14px;
         }
     }
 </style>
 
 <div class="esc-public-incidents">
     <div class="esc-public-header">
-        <h1><?php _e( 'Security Incidents & CVE Feeds', 'easy-status-check' ); ?></h1>
-        <p><?php _e( 'Aktuelle Sicherheitsvorfälle und Schwachstellen', 'easy-status-check' ); ?></p>
+        <h1><?php echo esc_html( isset( $public_settings['page_title'] ) ? $public_settings['page_title'] : 'Service Status' ); ?></h1>
+        <p><?php echo esc_html( isset( $public_settings['page_description'] ) ? $public_settings['page_description'] : 'Aktuelle Status-Informationen unserer Services' ); ?></p>
     </div>
 
     <div class="esc-public-nav">
@@ -175,8 +385,9 @@ get_header();
     </div>
 
     <?php if ( empty( $cve_feeds ) ) : ?>
-        <div style="text-align: center; padding: 40px; background: #fff; border-radius: 8px;">
-            <p><?php _e( 'Keine CVE Feeds konfiguriert. Bitte konfigurieren Sie CVE Feeds unter Status Check → Incidents → Public Status Page.', 'easy-status-check' ); ?></p>
+        <div class="esc-no-feeds">
+            <h2><?php _e( 'Keine CVE Feeds konfiguriert', 'easy-status-check' ); ?></h2>
+            <p><?php _e( 'Bitte konfigurieren Sie CVE Feeds unter Status Check → Incidents.', 'easy-status-check' ); ?></p>
         </div>
     <?php else : ?>
         <?php foreach ( $cve_feeds as $feed ) : 
@@ -189,11 +400,11 @@ get_header();
                 <?php else : ?>
                     <div class="esc-cve-grid">
                         <?php foreach ( $feed_data as $item ) : ?>
-                            <div class="esc-cve-card">
+                            <a href="<?php echo esc_url( $item['link'] ); ?>" class="esc-cve-card" target="_blank" rel="noopener noreferrer">
                                 <h3><?php echo esc_html( $item['title'] ); ?></h3>
                                 <div class="esc-cve-date"><?php echo esc_html( $item['date'] ); ?></div>
                                 <div class="esc-cve-description"><?php echo esc_html( wp_trim_words( $item['description'], 30 ) ); ?></div>
-                            </div>
+                            </a>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>

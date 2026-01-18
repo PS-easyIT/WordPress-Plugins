@@ -24,10 +24,12 @@ $public_settings = get_option( 'esc_public_settings', array(
     'text_color' => '#1d2327',
     'show_response_time' => true,
     'show_uptime' => true,
-    'columns' => 3
+    'columns' => 3,
+    'page_title' => 'Service Status',
+    'page_description' => 'Aktuelle Status-Informationen unserer Services'
 ) );
 
-$columns = get_option( 'esc_public_services_columns', 3 );
+$columns = isset( $public_settings['columns'] ) ? intval( $public_settings['columns'] ) : 3;
 
 // Get services with latest status
 $services = $wpdb->get_results( "
@@ -54,150 +56,288 @@ get_header();
 ?>
 
 <style>
+    :root {
+        --esc-primary: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
+        --esc-success: <?php echo esc_attr( $public_settings['success_color'] ); ?>;
+        --esc-warning: <?php echo esc_attr( $public_settings['warning_color'] ); ?>;
+        --esc-error: <?php echo esc_attr( $public_settings['error_color'] ); ?>;
+        --esc-bg: <?php echo esc_attr( $public_settings['background_color'] ); ?>;
+        --esc-text: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
+        --esc-border-radius: 12px;
+        --esc-shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+        --esc-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        --esc-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    
+    body.esc-public-page {
+        background: var(--esc-bg);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    
     .esc-public-services {
         max-width: 1400px;
-        margin: 40px auto;
-        padding: 0 20px;
+        margin: 0 auto;
+        padding: 60px 24px;
     }
     
     .esc-public-header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 48px;
+        animation: fadeInDown 0.6s ease-out;
+        background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+        padding: 40px 32px;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-md);
+        border: 1px solid #e5e7eb;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 48px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .esc-public-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--esc-primary), var(--esc-success));
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .esc-public-header h1 {
-        font-size: 36px;
-        margin-bottom: 10px;
-        color: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
+        font-size: clamp(28px, 4vw, 40px);
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--esc-text);
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+    
+    .esc-public-header p {
+        font-size: 16px;
+        color: #6b7280;
+        margin: 0;
+        line-height: 1.6;
     }
     
     .esc-public-nav {
         display: flex;
         justify-content: center;
-        gap: 20px;
-        margin-bottom: 40px;
+        gap: 12px;
+        margin-bottom: 48px;
         flex-wrap: wrap;
+        animation: fadeIn 0.6s ease-out 0.2s both;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     
     .esc-public-nav a {
-        padding: 12px 24px;
+        padding: 14px 28px;
         background: #fff;
-        border-radius: 6px;
+        border-radius: var(--esc-border-radius);
         text-decoration: none;
-        color: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
-        border: 2px solid transparent;
-        transition: all 0.3s;
-        font-weight: 500;
+        color: var(--esc-text);
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+        font-size: 15px;
+        box-shadow: var(--esc-shadow-sm);
     }
     
     .esc-public-nav a.active {
-        border-color: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
-        background: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
+        border-color: var(--esc-primary);
+        background: var(--esc-primary);
         color: #fff;
+        box-shadow: var(--esc-shadow-md);
+        transform: translateY(-1px);
     }
     
     .esc-public-nav a:hover:not(.active) {
-        border-color: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
+        border-color: var(--esc-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--esc-shadow-md);
     }
     
     .esc-services-grid {
         display: grid;
         grid-template-columns: repeat(<?php echo esc_attr( $columns ); ?>, 1fr);
-        gap: 20px;
+        gap: 24px;
+        animation: fadeIn 0.6s ease-out 0.4s both;
     }
     
     .esc-service-card {
         background: #fff;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-left: 5px solid #ddd;
-        transition: transform 0.2s, box-shadow 0.2s;
+        padding: 28px;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-sm);
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .esc-service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: currentColor;
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
     }
     
     .esc-service-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-4px);
+        box-shadow: var(--esc-shadow-lg);
+        border-color: currentColor;
     }
     
-    .esc-service-card.online { border-left-color: <?php echo esc_attr( $public_settings['success_color'] ); ?>; }
-    .esc-service-card.offline { border-left-color: <?php echo esc_attr( $public_settings['error_color'] ); ?>; }
-    .esc-service-card.warning { border-left-color: <?php echo esc_attr( $public_settings['warning_color'] ); ?>; }
+    .esc-service-card:hover::before {
+        transform: scaleY(1);
+    }
+    
+    .esc-service-card.online { color: var(--esc-success); border-left-color: var(--esc-success); }
+    .esc-service-card.offline { color: var(--esc-error); border-left-color: var(--esc-error); }
+    .esc-service-card.warning { color: var(--esc-warning); border-left-color: var(--esc-warning); }
+    .esc-service-card.unknown { color: #9ca3af; border-left-color: #9ca3af; }
     
     .esc-service-card h3 {
         font-size: 20px;
-        margin-bottom: 15px;
-        color: <?php echo esc_attr( $public_settings['text_color'] ); ?>;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--esc-text);
+        line-height: 1.3;
+        letter-spacing: -0.01em;
     }
     
     .esc-service-status {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 6px 12px;
-        border-radius: 4px;
+        gap: 10px;
+        padding: 8px 16px;
+        border-radius: 8px;
         font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 15px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
     
     .esc-service-status.online {
-        background: <?php echo esc_attr( $public_settings['success_color'] ); ?>22;
-        color: <?php echo esc_attr( $public_settings['success_color'] ); ?>;
+        background: linear-gradient(135deg, var(--esc-success)15, var(--esc-success)25);
+        color: var(--esc-success);
+        box-shadow: 0 2px 8px var(--esc-success)20;
     }
     
     .esc-service-status.offline {
-        background: <?php echo esc_attr( $public_settings['error_color'] ); ?>22;
-        color: <?php echo esc_attr( $public_settings['error_color'] ); ?>;
+        background: linear-gradient(135deg, var(--esc-error)15, var(--esc-error)25);
+        color: var(--esc-error);
+        box-shadow: 0 2px 8px var(--esc-error)20;
     }
     
     .esc-service-status.warning {
-        background: <?php echo esc_attr( $public_settings['warning_color'] ); ?>22;
-        color: <?php echo esc_attr( $public_settings['warning_color'] ); ?>;
+        background: linear-gradient(135deg, var(--esc-warning)15, var(--esc-warning)25);
+        color: var(--esc-warning);
+        box-shadow: 0 2px 8px var(--esc-warning)20;
+    }
+    
+    .esc-service-status.unknown {
+        background: #f3f4f6;
+        color: #6b7280;
     }
     
     .esc-service-status-dot {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background: currentColor;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
     }
     
     .esc-service-meta {
         display: flex;
-        gap: 20px;
+        gap: 24px;
         font-size: 14px;
-        color: #666;
-        margin-bottom: 15px;
+        color: #6b7280;
+        margin-bottom: 20px;
         flex-wrap: wrap;
     }
     
     .esc-service-meta-item {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
+        padding: 6px 12px;
+        background: #f9fafb;
+        border-radius: 6px;
+        font-weight: 500;
     }
     
     .esc-service-url {
         font-size: 13px;
-        color: #999;
-        margin-bottom: 15px;
+        color: #9ca3af;
+        margin-bottom: 20px;
         word-break: break-all;
+        font-family: 'Courier New', monospace;
+        background: #f9fafb;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
     }
     
     .esc-service-actions a {
-        padding: 8px 16px;
-        background: <?php echo esc_attr( $public_settings['primary_color'] ); ?>;
+        padding: 10px 20px;
+        background: var(--esc-primary);
         color: #fff;
         text-decoration: none;
-        border-radius: 4px;
+        border-radius: 8px;
         font-size: 14px;
-        transition: opacity 0.2s;
-        display: inline-block;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: var(--esc-shadow-sm);
     }
     
     .esc-service-actions a:hover {
-        opacity: 0.8;
+        background: color-mix(in srgb, var(--esc-primary) 85%, black);
+        transform: translateY(-2px);
+        box-shadow: var(--esc-shadow-md);
+    }
+    
+    .esc-service-actions a::after {
+        content: '→';
+        transition: transform 0.3s;
+    }
+    
+    .esc-service-actions a:hover::after {
+        transform: translateX(4px);
     }
     
     @media (max-width: 1200px) {
@@ -207,16 +347,61 @@ get_header();
     }
     
     @media (max-width: 768px) {
+        .esc-public-services {
+            padding: 40px 16px;
+        }
+        
+        .esc-public-header h1 {
+            font-size: 32px;
+        }
+        
+        .esc-public-header p {
+            font-size: 16px;
+        }
+        
         .esc-services-grid {
             grid-template-columns: 1fr;
+            gap: 16px;
         }
+        
+        .esc-service-card {
+            padding: 20px;
+        }
+        
+        .esc-public-nav {
+            gap: 8px;
+        }
+        
+        .esc-public-nav a {
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+    }
+    
+    .esc-no-services {
+        text-align: center;
+        padding: 80px 20px;
+        background: #fff;
+        border-radius: var(--esc-border-radius);
+        box-shadow: var(--esc-shadow-sm);
+    }
+    
+    .esc-no-services h2 {
+        font-size: 24px;
+        color: var(--esc-text);
+        margin-bottom: 12px;
+    }
+    
+    .esc-no-services p {
+        color: #6b7280;
+        font-size: 16px;
     }
 </style>
 
 <div class="esc-public-services">
     <div class="esc-public-header">
-        <h1><?php echo esc_html( get_option( 'esc_public_status_title', __( 'Service Status', 'easy-status-check' ) ) ); ?></h1>
-        <p><?php echo esc_html( get_option( 'esc_public_status_description', __( 'Aktuelle Status-Informationen unserer Services', 'easy-status-check' ) ) ); ?></p>
+        <h1><?php echo esc_html( isset( $public_settings['page_title'] ) ? $public_settings['page_title'] : 'Service Status' ); ?></h1>
+        <p><?php echo esc_html( isset( $public_settings['page_description'] ) ? $public_settings['page_description'] : 'Aktuelle Status-Informationen unserer Services' ); ?></p>
     </div>
 
     <div class="esc-public-nav">

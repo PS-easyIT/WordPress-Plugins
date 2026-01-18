@@ -551,11 +551,11 @@ class ESC_Public_Pages {
      * Fetch CVE feed data
      */
     private function fetch_cve_feed( $url, $max_items = 10 ) {
-        $transient_key = 'esc_cve_feed_' . md5( $url );
+        $transient_key = 'esc_cve_feed_' . md5( $url . '_' . $max_items );
         $cached = get_transient( $transient_key );
         
         if ( $cached !== false ) {
-            return array_slice( $cached, 0, $max_items );
+            return $cached;
         }
         
         $response = wp_remote_get( $url, array( 'timeout' => 15 ) );
